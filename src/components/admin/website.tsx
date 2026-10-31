@@ -335,7 +335,7 @@ export function AdminWebsiteView() {
           <AdminPair nameEn="hero_alt_en" nameAr="hero_alt_ar" label={t.admin.imageAlt} defaultEn={hero.alt.en} defaultAr={hero.alt.ar} />
         </AdminGroup>
         <AdminGroup title={t.admin.copyGroup}>
-          <AdminPair nameEn="hero_kicker_en" nameAr="hero_kicker_ar" label={t.admin.kicker} defaultEn={hero.kicker.en} defaultAr={hero.kicker.ar} />
+          <AdminPair nameEn="hero_kicker_en" nameAr="hero_kicker_ar" label={t.admin.kickerField} defaultEn={hero.kicker.en} defaultAr={hero.kicker.ar} />
           <AdminPair nameEn="hero_t1_en" nameAr="hero_t1_ar" label={`${t.admin.titleLine} 1`} defaultEn={hero.title.en[0]} defaultAr={hero.title.ar[0]} />
           <AdminPair nameEn="hero_t2_en" nameAr="hero_t2_ar" label={`${t.admin.titleLine} 2`} defaultEn={hero.title.en[1]} defaultAr={hero.title.ar[1]} />
           <AdminPair nameEn="hero_t3_en" nameAr="hero_t3_ar" label={`${t.admin.titleLine} 3`} defaultEn={hero.title.en[2]} defaultAr={hero.title.ar[2]} />
@@ -383,14 +383,14 @@ export function AdminWebsiteView() {
         <AdminGroup title={t.admin.aboutPage}>
           <ImageField name="page_about_image" label={t.admin.imagePath} defaultValue={pages.about.image} />
           <AdminPair nameEn="page_about_alt_en" nameAr="page_about_alt_ar" label={t.admin.imageAlt} defaultEn={pages.about.imageAlt.en} defaultAr={pages.about.imageAlt.ar} />
-          <AdminPair nameEn="page_about_k_en" nameAr="page_about_k_ar" label={t.admin.kicker} defaultEn={pages.about.kicker.en} defaultAr={pages.about.kicker.ar} />
+          <AdminPair nameEn="page_about_k_en" nameAr="page_about_k_ar" label={t.admin.kickerField} defaultEn={pages.about.kicker.en} defaultAr={pages.about.kicker.ar} />
           <AdminPair nameEn="page_about_n_en" nameAr="page_about_n_ar" label={t.admin.nameField} defaultEn={pages.about.name.en} defaultAr={pages.about.name.ar} />
           <AdminPair nameEn="page_about_q_en" nameAr="page_about_q_ar" label={t.admin.quote} defaultEn={pages.about.quote.en} defaultAr={pages.about.quote.ar} area />
           <AdminPair nameEn="page_about_l_en" nameAr="page_about_l_ar" label={t.admin.lead} defaultEn={pages.about.lead.en} defaultAr={pages.about.lead.ar} area />
           <AdminPair nameEn="page_about_a_en" nameAr="page_about_a_ar" label={t.admin.buttonField} defaultEn={pages.about.action.en} defaultAr={pages.about.action.ar} />
         </AdminGroup>
         <AdminGroup title={t.admin.story}>
-          <AdminPair nameEn="page_about_sk_en" nameAr="page_about_sk_ar" label={t.admin.kicker} defaultEn={pages.about.storyKicker.en} defaultAr={pages.about.storyKicker.ar} />
+          <AdminPair nameEn="page_about_sk_en" nameAr="page_about_sk_ar" label={t.admin.kickerField} defaultEn={pages.about.storyKicker.en} defaultAr={pages.about.storyKicker.ar} />
           <AdminPair nameEn="page_about_sh_en" nameAr="page_about_sh_ar" label={t.admin.headingField} defaultEn={pages.about.storyHeading.en} defaultAr={pages.about.storyHeading.ar} />
           <ImageField name="page_about_simage" label={t.admin.imagePath} defaultValue={pages.about.storyImage} />
           <AdminPair nameEn="page_about_salt_en" nameAr="page_about_salt_ar" label={t.admin.imageAlt} defaultEn={pages.about.storyImageAlt.en} defaultAr={pages.about.storyImageAlt.ar} />
@@ -402,7 +402,7 @@ export function AdminWebsiteView() {
           ))}
         </AdminGroup>
         <AdminGroup title={t.admin.method}>
-          <AdminPair nameEn="page_about_mk_en" nameAr="page_about_mk_ar" label={t.admin.kicker} defaultEn={pages.about.methodKicker.en} defaultAr={pages.about.methodKicker.ar} />
+          <AdminPair nameEn="page_about_mk_en" nameAr="page_about_mk_ar" label={t.admin.kickerField} defaultEn={pages.about.methodKicker.en} defaultAr={pages.about.methodKicker.ar} />
           <AdminPair nameEn="page_about_mt_en" nameAr="page_about_mt_ar" label={t.admin.titleField} defaultEn={pages.about.methodTitle.en} defaultAr={pages.about.methodTitle.ar} />
           {pages.about.steps.map((step, index) => (
             <AdminGroup key={index} title={`${t.admin.step} ${index + 1}`}>
@@ -419,7 +419,7 @@ export function AdminWebsiteView() {
           <AdminPair nameEn="programs_l_en" nameAr="programs_l_ar" label={t.admin.linkLabel} defaultEn={s.programs.link.en} defaultAr={s.programs.link.ar} />
         </AdminGroup>
         <AdminGroup title={t.admin.programsPage}>
-          <AdminPair nameEn="page_prog_k_en" nameAr="page_prog_k_ar" label={t.admin.kicker} defaultEn={pages.programs.kicker.en} defaultAr={pages.programs.kicker.ar} />
+          <AdminPair nameEn="page_prog_k_en" nameAr="page_prog_k_ar" label={t.admin.kickerField} defaultEn={pages.programs.kicker.en} defaultAr={pages.programs.kicker.ar} />
           <AdminPair nameEn="page_prog_t_en" nameAr="page_prog_t_ar" label={t.admin.titleField} defaultEn={pages.programs.title.en} defaultAr={pages.programs.title.ar} />
           <AdminPair nameEn="page_prog_l_en" nameAr="page_prog_l_ar" label={t.admin.lead} defaultEn={pages.programs.lead.en} defaultAr={pages.programs.lead.ar} area />
           <AdminPair nameEn="page_prog_c_en" nameAr="page_prog_c_ar" label={t.admin.closeText} defaultEn={pages.programs.close.en} defaultAr={pages.programs.close.ar} area />
@@ -455,7 +455,7 @@ export function AdminWebsiteView() {
           <AdminPair nameEn="work_l_en" nameAr="work_l_ar" label={t.admin.linkLabel} defaultEn={s.transformations.link.en} defaultAr={s.transformations.link.ar} />
         </AdminGroup>
         <AdminGroup title={t.admin.resultsPage}>
-          <AdminPair nameEn="page_work_k_en" nameAr="page_work_k_ar" label={t.admin.kicker} defaultEn={pages.transformations.kicker.en} defaultAr={pages.transformations.kicker.ar} />
+          <AdminPair nameEn="page_work_k_en" nameAr="page_work_k_ar" label={t.admin.kickerField} defaultEn={pages.transformations.kicker.en} defaultAr={pages.transformations.kicker.ar} />
           <AdminPair nameEn="page_work_t1_en" nameAr="page_work_t1_ar" label={`${t.admin.titleLine} 1`} defaultEn={pages.transformations.title.en[0]} defaultAr={pages.transformations.title.ar[0]} />
           <AdminPair nameEn="page_work_t2_en" nameAr="page_work_t2_ar" label={`${t.admin.titleLine} 2`} defaultEn={pages.transformations.title.en[1]} defaultAr={pages.transformations.title.ar[1]} />
           <AdminPair nameEn="page_work_l_en" nameAr="page_work_l_ar" label={t.admin.lead} defaultEn={pages.transformations.lead.en} defaultAr={pages.transformations.lead.ar} area />
@@ -475,7 +475,7 @@ export function AdminWebsiteView() {
           <AdminPair nameEn="pricing_h_en" nameAr="pricing_h_ar" label={t.admin.headingField} defaultEn={s.pricing.heading.en} defaultAr={s.pricing.heading.ar} />
         </AdminGroup>
         <AdminGroup title={t.admin.pricingPage}>
-          <AdminPair nameEn="page_price_k_en" nameAr="page_price_k_ar" label={t.admin.kicker} defaultEn={pages.pricing.kicker.en} defaultAr={pages.pricing.kicker.ar} />
+          <AdminPair nameEn="page_price_k_en" nameAr="page_price_k_ar" label={t.admin.kickerField} defaultEn={pages.pricing.kicker.en} defaultAr={pages.pricing.kicker.ar} />
           <AdminPair nameEn="page_price_t_en" nameAr="page_price_t_ar" label={t.admin.titleField} defaultEn={pages.pricing.title.en} defaultAr={pages.pricing.title.ar} />
           <AdminPair nameEn="page_price_l_en" nameAr="page_price_l_ar" label={t.admin.lead} defaultEn={pages.pricing.lead.en} defaultAr={pages.pricing.lead.ar} area />
           <AdminPair nameEn="page_price_cmp_en" nameAr="page_price_cmp_ar" label={t.admin.compare} defaultEn={pages.pricing.compare.en} defaultAr={pages.pricing.compare.ar} />
@@ -500,7 +500,7 @@ export function AdminWebsiteView() {
 
       <Panel id="faq" active={active} title={t.admin.faq} switchName="sec_faq" visible={s.faq.visible}>
         <AdminPair nameEn="faq_h_en" nameAr="faq_h_ar" label={t.admin.headingField} defaultEn={s.faq.heading.en} defaultAr={s.faq.heading.ar} />
-        <AdminPair nameEn="page_faq_k_en" nameAr="page_faq_k_ar" label={t.admin.kicker} defaultEn={pages.faq.kicker.en} defaultAr={pages.faq.kicker.ar} />
+        <AdminPair nameEn="page_faq_k_en" nameAr="page_faq_k_ar" label={t.admin.kickerField} defaultEn={pages.faq.kicker.en} defaultAr={pages.faq.kicker.ar} />
         <AdminPair nameEn="page_faq_s_en" nameAr="page_faq_s_ar" label={t.admin.still} defaultEn={pages.faq.still.en} defaultAr={pages.faq.still.ar} />
         <AdminPair nameEn="page_faq_sb_en" nameAr="page_faq_sb_ar" label={t.admin.stillBody} defaultEn={pages.faq.stillBody.en} defaultAr={pages.faq.stillBody.ar} area />
         <AdminPair nameEn="page_faq_c_en" nameAr="page_faq_c_ar" label={t.admin.buttonField} defaultEn={pages.faq.contact.en} defaultAr={pages.faq.contact.ar} />
@@ -520,7 +520,7 @@ export function AdminWebsiteView() {
       </Panel>
 
       <Panel id="contact" active={active} title={t.admin.contactPage}>
-        <AdminPair nameEn="page_con_k_en" nameAr="page_con_k_ar" label={t.admin.kicker} defaultEn={pages.contact.kicker.en} defaultAr={pages.contact.kicker.ar} />
+        <AdminPair nameEn="page_con_k_en" nameAr="page_con_k_ar" label={t.admin.kickerField} defaultEn={pages.contact.kicker.en} defaultAr={pages.contact.kicker.ar} />
         <AdminPair nameEn="page_con_t_en" nameAr="page_con_t_ar" label={t.admin.titleField} defaultEn={pages.contact.title.en} defaultAr={pages.contact.title.ar} />
         <AdminPair nameEn="page_con_l_en" nameAr="page_con_l_ar" label={t.admin.lead} defaultEn={pages.contact.lead.en} defaultAr={pages.contact.lead.ar} area />
         <AdminPair nameEn="page_con_e_en" nameAr="page_con_e_ar" label={t.admin.emailField} defaultEn={pages.contact.emailLabel.en} defaultAr={pages.contact.emailLabel.ar} />

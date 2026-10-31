@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+:root {
+  --background: #e8f2fc;
+  --foreground: #000000;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-background: #e8f2fc;
+  --color-foreground: #000000;
+  --color-primary: #2443b2;
+  --color-muted: #777777;
+  --color-line: #b7cce8;
+  --color-surface: #d7e8f8;
+  --color-surface-2: #c9ddf4;
+  --font-sans: var(--font-manrope), sans-serif;
+  --font-display: var(--font-archivo), sans-serif;
+  --font-arabic: var(--font-noto-arabic), "Noto Sans Arabic", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #e8f2fc;
+  color: #000000;
+  font-family: var(--font-manrope), sans-serif;
+  text-rendering: optimizeLegibility;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+html[dir="rtl"] .font-display,
+html[dir="rtl"] .font-arabic {
+  letter-spacing: 0;
+}
+
+html[dir="ltr"] body {
+  letter-spacing: normal;
+  word-spacing: normal;
+}
+
+[data-admin] {
+  letter-spacing: 0;
+  word-spacing: 0.05em;
+  font-family: var(--font-manrope), sans-serif;
+}
+
+[data-admin] .font-arabic {
+  letter-spacing: 0;
+  word-spacing: normal;
+}
+
+[data-admin] input,
+[data-admin] textarea,
+[data-admin] select {
+  font-family: var(--font-manrope), sans-serif;
+  letter-spacing: 0;
+  word-spacing: 0.06em;
+}
+
+[data-admin] input[dir="rtl"],
+[data-admin] textarea[dir="rtl"] {
+  font-family: var(--font-arabic);
+  word-spacing: normal;
+}
+
+main,
+footer {
+  overflow-x: clip;
+}
+
+::selection {
+  background: #2443b2;
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid #2443b2;
+  outline-offset: 3px;
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal-rise {
+  animation: reveal-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.swipe-row {
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+}
+
+.swipe-row::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

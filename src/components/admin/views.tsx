@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useMemo, useState } from "react";
 
 import { AdminArea, AdminField, AdminSwitch } from "@/components/admin/fields";
+import { ImageField } from "@/components/admin/image-field";
 import { DashTitle } from "@/components/dashboard/ui";
 import { Button, Skeleton } from "@/components/ui/primitives";
 import { errorMessage } from "@/lib/api";
@@ -265,9 +266,11 @@ export function AdminProgramForm({ id }: { id?: number }) {
         <AdminField name="category" label="Category" defaultValue={data?.category || "online-coaching"} />
         <AdminField name="difficulty" label="Difficulty" defaultValue={data?.difficulty || "all"} />
         <AdminField name="goal" label="Goal" defaultValue={data?.goal} />
-        <AdminField name="featured_image" label="Image path" defaultValue={data?.featured_image} />
         <AdminField name="image_alt" label="Image alt" defaultValue={data?.image_alt} />
       </FormGrid>
+      <div className="mt-4">
+        <ImageField name="featured_image" label={t.admin.imagePath} defaultValue={data?.featured_image} />
+      </div>
       <div className="mt-4 grid gap-4">
         <AdminField name="short_description" label="Short description" defaultValue={data?.short_description} />
         <AdminArea name="description" label="Description" defaultValue={data?.description} />
@@ -501,12 +504,12 @@ export function AdminTransformationForm({ id }: { id?: number }) {
         <AdminField name="slug" label="Slug" defaultValue={data?.slug} />
         <AdminField name="program_name" label="Program name" defaultValue={data?.program_name} />
         <AdminField name="duration_weeks" label="Weeks" type="number" defaultValue={String(data?.duration_weeks || 12)} />
-        <AdminField name="before_image" label="Before image" defaultValue={data?.before_image} />
-        <AdminField name="after_image" label="After image" defaultValue={data?.after_image} />
-        <AdminField name="cover_image" label="Cover image" defaultValue={data?.cover_image} />
         <AdminField name="order" label="Order" type="number" defaultValue={String(data?.order || 0)} />
       </FormGrid>
       <div className="mt-4 grid gap-4">
+        <ImageField name="before_image" label="Before image" defaultValue={data?.before_image} />
+        <ImageField name="after_image" label="After image" defaultValue={data?.after_image} />
+        <ImageField name="cover_image" label="Cover image" defaultValue={data?.cover_image} />
         <AdminField name="result_summary" label="Summary" defaultValue={data?.result_summary} />
         <AdminField name="image_alt" label="Image alt" defaultValue={data?.image_alt} />
         <AdminArea name="story" label="Story" defaultValue={data?.story} />

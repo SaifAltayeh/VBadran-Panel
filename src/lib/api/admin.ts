@@ -16,6 +16,16 @@ export const getAdminSite = () => apiFetch<SiteHome>("/admin/site/").then(mergeS
 export const updateAdminSite = (payload: Partial<SiteHome>) =>
   apiFetch<SiteHome>("/admin/site/", { method: "PATCH", body: JSON.stringify(payload) });
 
+export function uploadAdminImage(file: File) {
+  const body = new FormData();
+  body.append("file", file);
+  return apiFetch<{ url: string; path: string }>("/admin/uploads/", {
+    method: "POST",
+    body,
+    timeoutMs: 60000,
+  });
+}
+
 export const getAdminOverview = () => apiFetch<AdminOverview>("/admin/overview/");
 export const getAdminPrograms = () => apiFetch<AdminProgram[]>("/admin/programs/");
 export const getAdminProgram = (id: number) => apiFetch<AdminProgram>(`/admin/programs/${id}/`);

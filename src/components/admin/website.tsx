@@ -1,9 +1,10 @@
 "use client";
 
-import { ImageIcon, Link2 } from "lucide-react";
+import { Link2 } from "lucide-react";
 import { FormEvent, useCallback, useState } from "react";
 
 import { AdminField, AdminGroup, AdminPair, AdminSaveBar, AdminSwitch } from "@/components/admin/fields";
+import { ImageField } from "@/components/admin/image-field";
 import { Skeleton } from "@/components/ui/primitives";
 import { errorMessage } from "@/lib/api";
 import { getAdminSite, updateAdminSite } from "@/lib/api/admin";
@@ -14,39 +15,6 @@ import type { SiteHome } from "@/lib/site-home";
 
 const sectionIds = ["hero", "about", "programs", "process", "transformations", "testimonials", "pricing", "why", "faq", "cta", "contact", "footer"] as const;
 type SectionId = (typeof sectionIds)[number];
-
-function ImageField({ name, label, defaultValue }: { name: string; label: string; defaultValue?: string }) {
-  const { t, arabic } = useLang();
-  const [src, setSrc] = useState(defaultValue || "");
-  return (
-    <div className="grid gap-4 lg:grid-cols-[160px_minmax(0,1fr)]">
-      <div className="overflow-hidden rounded-[18px] border border-[#e6ecf4] bg-white">
-        {src ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={src.startsWith("http") ? src : `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3010"}${src}`}
-            alt={t.admin.imagePreview}
-            className="h-28 w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-28 flex-col items-center justify-center gap-2 text-neutral-400">
-            <ImageIcon className="h-5 w-5" />
-            <span className={`text-xs ${arabic ? "font-arabic" : "font-sans tracking-normal [word-spacing:0.06em]"}`}>{t.admin.imagePreview}</span>
-          </div>
-        )}
-      </div>
-      <AdminField
-        name={name}
-        label={label}
-        defaultValue={defaultValue}
-        dir="ltr"
-        icon={<ImageIcon className="h-4 w-4" />}
-        placeholder="/images/hero/banner.jpg"
-        onChange={(event) => setSrc(event.target.value)}
-      />
-    </div>
-  );
-}
 
 function Panel({
   id,
@@ -103,8 +71,8 @@ export function AdminWebsiteView() {
         alt: { en: String(form.get("hero_alt_en") || ""), ar: String(form.get("hero_alt_ar") || "") },
         kicker: { en: String(form.get("hero_kicker_en") || ""), ar: String(form.get("hero_kicker_ar") || "") },
         title: {
-          en: [String(form.get("hero_t1_en") || ""), String(form.get("hero_t2_en") || ""), String(form.get("hero_t3_en") || "")],
-          ar: [String(form.get("hero_t1_ar") || ""), String(form.get("hero_t2_ar") || ""), String(form.get("hero_t3_ar") || "")],
+          en: String(form.get("hero_title_en") || ""),
+          ar: String(form.get("hero_title_ar") || ""),
         },
         lead: { en: String(form.get("hero_lead_en") || ""), ar: String(form.get("hero_lead_ar") || "") },
         primary: {
@@ -336,9 +304,7 @@ export function AdminWebsiteView() {
         </AdminGroup>
         <AdminGroup title={t.admin.copyGroup}>
           <AdminPair nameEn="hero_kicker_en" nameAr="hero_kicker_ar" label={t.admin.kickerField} defaultEn={hero.kicker.en} defaultAr={hero.kicker.ar} />
-          <AdminPair nameEn="hero_t1_en" nameAr="hero_t1_ar" label={`${t.admin.titleLine} 1`} defaultEn={hero.title.en[0]} defaultAr={hero.title.ar[0]} />
-          <AdminPair nameEn="hero_t2_en" nameAr="hero_t2_ar" label={`${t.admin.titleLine} 2`} defaultEn={hero.title.en[1]} defaultAr={hero.title.ar[1]} />
-          <AdminPair nameEn="hero_t3_en" nameAr="hero_t3_ar" label={`${t.admin.titleLine} 3`} defaultEn={hero.title.en[2]} defaultAr={hero.title.ar[2]} />
+          <AdminPair nameEn="hero_title_en" nameAr="hero_title_ar" label={t.admin.titleField} defaultEn={hero.title.en} defaultAr={hero.title.ar} area />
           <AdminPair nameEn="hero_lead_en" nameAr="hero_lead_ar" label={t.admin.lead} defaultEn={hero.lead.en} defaultAr={hero.lead.ar} area />
         </AdminGroup>
         <AdminGroup title={t.admin.buttons}>

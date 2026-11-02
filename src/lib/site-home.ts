@@ -1,5 +1,4 @@
 export type LocaleText = { en: string; ar: string };
-export type LocaleLines = { en: [string, string, string]; ar: [string, string, string] };
 export type LocalePair = { en: string[]; ar: string[] };
 export type ProcessCard = {
   n: string;
@@ -14,7 +13,7 @@ export type SiteHome = {
     image: string;
     alt: LocaleText;
     kicker: LocaleText;
-    title: LocaleLines;
+    title: LocaleText;
     lead: LocaleText;
     primary: { label: LocaleText; href: string };
     secondary: { label: LocaleText; href: string };
@@ -100,7 +99,7 @@ export const defaultSiteHome: SiteHome = {
     image: "/images/hero/stage-cinematic.jpg",
     alt: { en: "Badran on stage holding a trophy", ar: "بدران على المسرح حاملاً الكأس" },
     kicker: { en: "Personal training / Online coaching · Badran", ar: "تدريب شخصي / تدريب عن بُعد · بدران" },
-    title: { en: ["Build your", "strongest", "self."], ar: ["ابنِ", "أقوى", "نسخة منك."] },
+    title: { en: "Build your strongest self.", ar: "ابنِ أقوى نسخة منك." },
     lead: { en: "Strength, nutrition, and a week you can keep.", ar: "قوة، تغذية، وأسبوع تستطيع الالتزام به." },
     primary: { label: { en: "Start your program", ar: "ابدأ برنامجك" }, href: "/programs" },
     secondary: { label: { en: "Talk to the coach", ar: "تحدث مع المدرب" }, href: "/contact" },
@@ -365,6 +364,12 @@ export const defaultSiteHome: SiteHome = {
   },
 };
 
+function localeTitle(value: unknown, fallback: string) {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return value.map(String).filter(Boolean).join(" ");
+  return fallback;
+}
+
 export function mergeSiteHome(incoming?: Partial<SiteHome> | null): SiteHome {
   const merge = (base: unknown, extra: unknown): unknown => {
     if (!extra || typeof extra !== "object" || Array.isArray(extra)) return extra ?? base;
@@ -375,5 +380,10 @@ export function mergeSiteHome(incoming?: Partial<SiteHome> | null): SiteHome {
     }
     return out;
   };
-  return merge(defaultSiteHome, incoming || {}) as SiteHome;
+  const merged = merge(defaultSiteHome, incoming || {}) as SiteHome;
+  merged.hero.title = {
+    en: localeTitle(merged.hero?.title?.en, defaultSiteHome.hero.title.en),
+    ar: localeTitle(merged.hero?.title?.ar, defaultSiteHome.hero.title.ar),
+  };
+  return merged;
 }

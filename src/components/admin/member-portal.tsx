@@ -12,8 +12,10 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { BackLink } from "@/components/admin/back-link";
 import { AdminArea, AdminField, AdminSwitch } from "@/components/admin/fields";
 import { ImageField } from "@/components/admin/image-field";
+import { VideoField } from "@/components/admin/video-field";
 import { DashTitle } from "@/components/dashboard/ui";
 import { Button, Skeleton } from "@/components/ui/primitives";
 import { errorMessage } from "@/lib/api";
@@ -186,6 +188,7 @@ export function MemberPortalHub() {
   const { t, arabic } = useLang();
   return (
     <div>
+      <BackLink href="/admin" label={t.admin.overview} />
       <DashTitle arabic={arabic}>{t.admin.memberPortal}</DashTitle>
       <p className={`mt-2 max-w-2xl text-sm text-neutral-500 ${arabic ? "font-arabic" : ""}`}>{t.admin.memberPortalLead}</p>
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -219,6 +222,7 @@ export function AdminPortalVideoList() {
   if (!data) return <p>{t.admin.loadError}</p>;
   return (
     <div>
+      <BackLink href="/admin/member-portal" />
       <ListHeader title={t.admin.portalVideos} href="/admin/member-portal/videos/new" create={t.admin.newItem} />
       <TableCard>
         {data.length === 0 ? <p className="p-6 text-neutral-500">{t.admin.empty}</p> : null}
@@ -257,7 +261,7 @@ export function AdminPortalVideoForm({ id }: { id?: number }) {
     const title = String(raw.get("title") || "").trim();
     const video_url = String(raw.get("video_url") || "").trim();
     if (!title || !video_url) {
-      form.setError(arabic ? "العنوان ورابط الفيديو مطلوبان." : "Title and video link are required.");
+      form.setError(arabic ? "العنوان والفيديو مطلوبان." : "Title and video upload are required.");
       return;
     }
     const payload = {
@@ -289,59 +293,57 @@ export function AdminPortalVideoForm({ id }: { id?: number }) {
   }
 
   return (
-    <FormShell
-      title={data?.title || t.admin.newItem}
-      onSubmit={onSubmit}
-      pending={form.pending}
-      error={form.error}
-      notice={form.notice}
-      onDelete={
-        id
-          ? async () => {
-              if (!window.confirm(t.admin.remove)) return;
-              await deleteAdminPortalVideo(id);
-              router.push("/admin/member-portal/videos");
-            }
-          : undefined
-      }
-    >
-      <FormGrid>
-        <AdminField name="title" label={t.admin.titleField} defaultValue={data?.title} required />
-        <label className="grid gap-1.5">
-          <span className="text-[12px] font-medium text-neutral-500">{t.admin.programs}</span>
-          <select
-            name="program"
-            defaultValue={data?.program || programs.data?.[0]?.id || ""}
-            className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
-            required
-          >
-            {(programs.data || []).map((program) => (
-              <option key={program.id} value={program.id}>
-                {program.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <AdminField
-          name="video_url"
-          label={t.admin.videoUrl}
-          defaultValue={data?.video_url}
-          placeholder="https://youtube.com/watch?v=… or .mp4 link"
-          required
-        />
-        <AdminField name="order" label={t.admin.orderField} type="number" defaultValue={String(data?.order ?? 0)} />
-      </FormGrid>
-      <div className="mt-4">
-        <ImageField name="thumbnail" label={t.admin.imagePath} defaultValue={data?.thumbnail} />
-      </div>
-      <div className="mt-4">
-        <AdminArea name="description" label={t.admin.textField} defaultValue={data?.description} />
-      </div>
-      <div className="mt-5">
-        <AdminSwitch name="is_active" label={t.admin.active} defaultChecked={data?.is_active ?? true} />
-      </div>
-      <p className="mt-3 text-xs text-neutral-400">{t.admin.videoUrlHint}</p>
-    </FormShell>
+    <div>
+      <BackLink href="/admin/member-portal/videos" />
+      <FormShell
+        title={data?.title || t.admin.newItem}
+        onSubmit={onSubmit}
+        pending={form.pending}
+        error={form.error}
+        notice={form.notice}
+        onDelete={
+          id
+            ? async () => {
+                if (!window.confirm(t.admin.remove)) return;
+                await deleteAdminPortalVideo(id);
+                router.push("/admin/member-portal/videos");
+              }
+            : undefined
+        }
+      >
+        <FormGrid>
+          <AdminField name="title" label={t.admin.titleField} defaultValue={data?.title} required />
+          <label className="grid gap-1.5">
+            <span className="text-[12px] font-medium text-neutral-500">{t.admin.programs}</span>
+            <select
+              name="program"
+              defaultValue={data?.program || programs.data?.[0]?.id || ""}
+              className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
+              required
+            >
+              {(programs.data || []).map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <AdminField name="order" label={t.admin.orderField} type="number" defaultValue={String(data?.order ?? 0)} />
+        </FormGrid>
+        <div className="mt-4">
+          <VideoField name="video_url" label={t.admin.videoFile} defaultValue={data?.video_url} />
+        </div>
+        <div className="mt-4">
+          <ImageField name="thumbnail" label={t.admin.imagePath} defaultValue={data?.thumbnail} preset="videoThumb" />
+        </div>
+        <div className="mt-4">
+          <AdminArea name="description" label={t.admin.textField} defaultValue={data?.description} />
+        </div>
+        <div className="mt-5">
+          <AdminSwitch name="is_active" label={t.admin.active} defaultChecked={data?.is_active ?? true} />
+        </div>
+      </FormShell>
+    </div>
   );
 }
 
@@ -352,6 +354,7 @@ export function AdminExerciseList() {
   if (!data) return <p>{t.admin.loadError}</p>;
   return (
     <div>
+      <BackLink href="/admin/member-portal" />
       <ListHeader title={t.admin.portalExercises} href="/admin/member-portal/exercises/new" create={t.admin.newItem} />
       <TableCard>
         {data.length === 0 ? <p className="p-6 text-neutral-500">{t.admin.empty}</p> : null}
@@ -423,40 +426,44 @@ export function AdminExerciseForm({ id }: { id?: number }) {
   }
 
   return (
-    <FormShell
-      title={data?.name || t.admin.newItem}
-      onSubmit={onSubmit}
-      pending={form.pending}
-      error={form.error}
-      notice={form.notice}
-      onDelete={
-        id
-          ? async () => {
-              if (!window.confirm(t.admin.remove)) return;
-              await deleteAdminExercise(id);
-              router.push("/admin/member-portal/exercises");
-            }
-          : undefined
-      }
-    >
-      <FormGrid>
-        <AdminField name="name" label={t.admin.nameField} defaultValue={data?.name} required />
-        <AdminField name="slug" label="Slug" defaultValue={data?.slug} />
-        <AdminField name="muscle_group" label={t.admin.muscleGroup} defaultValue={data?.muscle_group || "Full body"} />
-        <AdminField name="difficulty" label={t.admin.difficultyField} defaultValue={data?.difficulty || "intermediate"} />
-        <AdminField name="video_url" label={t.admin.videoUrl} defaultValue={data?.video_url} placeholder="https://…" />
-        <AdminField name="image_alt" label={t.admin.imageAlt} defaultValue={data?.image_alt} />
-      </FormGrid>
-      <div className="mt-4">
-        <ImageField name="thumbnail" label={t.admin.imagePath} defaultValue={data?.thumbnail} />
-      </div>
-      <div className="mt-4 grid gap-4">
-        <AdminArea name="description" label={t.admin.textField} defaultValue={data?.description} />
-        <AdminArea name="instructions" label={t.admin.instructionsField} defaultValue={data?.instructions} />
-        <AdminArea name="tips" label={t.admin.tipsField} defaultValue={data?.tips} />
-      </div>
-      <p className="mt-3 text-xs text-neutral-400">{t.admin.videoUrlHint}</p>
-    </FormShell>
+    <div>
+      <BackLink href="/admin/member-portal/exercises" />
+      <FormShell
+        title={data?.name || t.admin.newItem}
+        onSubmit={onSubmit}
+        pending={form.pending}
+        error={form.error}
+        notice={form.notice}
+        onDelete={
+          id
+            ? async () => {
+                if (!window.confirm(t.admin.remove)) return;
+                await deleteAdminExercise(id);
+                router.push("/admin/member-portal/exercises");
+              }
+            : undefined
+        }
+      >
+        <FormGrid>
+          <AdminField name="name" label={t.admin.nameField} defaultValue={data?.name} required />
+          <AdminField name="slug" label="Slug" defaultValue={data?.slug} />
+          <AdminField name="muscle_group" label={t.admin.muscleGroup} defaultValue={data?.muscle_group || "Full body"} />
+          <AdminField name="difficulty" label={t.admin.difficultyField} defaultValue={data?.difficulty || "intermediate"} />
+          <AdminField name="image_alt" label={t.admin.imageAlt} defaultValue={data?.image_alt} />
+        </FormGrid>
+        <div className="mt-4">
+          <VideoField name="video_url" label={t.admin.videoFile} defaultValue={data?.video_url} />
+        </div>
+        <div className="mt-4">
+          <ImageField name="thumbnail" label={t.admin.imagePath} defaultValue={data?.thumbnail} preset="exercise" />
+        </div>
+        <div className="mt-4 grid gap-4">
+          <AdminArea name="description" label={t.admin.textField} defaultValue={data?.description} />
+          <AdminArea name="instructions" label={t.admin.instructionsField} defaultValue={data?.instructions} />
+          <AdminArea name="tips" label={t.admin.tipsField} defaultValue={data?.tips} />
+        </div>
+      </FormShell>
+    </div>
   );
 }
 
@@ -467,6 +474,7 @@ export function AdminWorkoutList() {
   if (!data) return <p>{t.admin.loadError}</p>;
   return (
     <div>
+      <BackLink href="/admin/member-portal" />
       <ListHeader title={t.admin.portalWorkouts} href="/admin/member-portal/workouts/new" create={t.admin.newItem} />
       <TableCard>
         {data.length === 0 ? <p className="p-6 text-neutral-500">{t.admin.empty}</p> : null}
@@ -565,22 +573,24 @@ export function AdminWorkoutForm({ id }: { id?: number }) {
   }
 
   return (
-    <FormShell
-      title={data?.title || t.admin.newItem}
-      onSubmit={onSubmit}
-      pending={form.pending}
-      error={form.error}
-      notice={form.notice}
-      onDelete={
-        id
-          ? async () => {
-              if (!window.confirm(t.admin.remove)) return;
-              await deleteAdminWorkout(id);
-              router.push("/admin/member-portal/workouts");
-            }
-          : undefined
-      }
-    >
+    <div>
+      <BackLink href="/admin/member-portal/workouts" />
+      <FormShell
+        title={data?.title || t.admin.newItem}
+        onSubmit={onSubmit}
+        pending={form.pending}
+        error={form.error}
+        notice={form.notice}
+        onDelete={
+          id
+            ? async () => {
+                if (!window.confirm(t.admin.remove)) return;
+                await deleteAdminWorkout(id);
+                router.push("/admin/member-portal/workouts");
+              }
+            : undefined
+        }
+      >
       <FormGrid>
         <AdminField name="title" label={t.admin.titleField} defaultValue={data?.title} required />
         <AdminField name="slug" label="Slug" defaultValue={data?.slug} />
@@ -608,7 +618,8 @@ export function AdminWorkoutForm({ id }: { id?: number }) {
           ))}
         </ul>
       </div>
-    </FormShell>
+      </FormShell>
+    </div>
   );
 }
 
@@ -619,6 +630,7 @@ export function AdminScheduleList() {
   if (!data) return <p>{t.admin.loadError}</p>;
   return (
     <div>
+      <BackLink href="/admin/member-portal" />
       <ListHeader title={t.admin.portalSchedules} href="/admin/member-portal/schedules/new" create={t.admin.newItem} />
       <TableCard>
         {data.length === 0 ? <p className="p-6 text-neutral-500">{t.admin.empty}</p> : null}
@@ -685,61 +697,64 @@ export function AdminScheduleForm({ id }: { id?: number }) {
   }
 
   return (
-    <FormShell
-      title={data ? `${data.program_title} W${data.week_number}` : t.admin.newItem}
-      onSubmit={onSubmit}
-      pending={form.pending}
-      error={form.error}
-      notice={form.notice}
-      onDelete={
-        id
-          ? async () => {
-              if (!window.confirm(t.admin.remove)) return;
-              await deleteAdminSchedule(id);
-              router.push("/admin/member-portal/schedules");
-            }
-          : undefined
-      }
-    >
-      <FormGrid>
-        <label className="grid gap-1.5">
-          <span className="text-[12px] font-medium text-neutral-500">{t.admin.programs}</span>
-          <select
-            name="program"
-            defaultValue={data?.program || programs.data?.[0]?.id || ""}
-            className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
-            required
-          >
-            {(programs.data || []).map((program) => (
-              <option key={program.id} value={program.id}>
-                {program.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="grid gap-1.5">
-          <span className="text-[12px] font-medium text-neutral-500">{t.admin.portalWorkouts}</span>
-          <select
-            name="workout"
-            defaultValue={data?.workout || ""}
-            className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
-          >
-            <option value="">—</option>
-            {(workouts.data || []).map((workout) => (
-              <option key={workout.id} value={workout.id}>
-                {workout.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <AdminField name="week_number" label={t.admin.weekField} type="number" defaultValue={String(data?.week_number || 1)} />
-        <AdminField name="day_index" label={t.admin.dayIndexField} type="number" defaultValue={String(data?.day_index ?? 0)} />
-        <AdminField name="day_label" label={t.admin.dayLabelField} defaultValue={data?.day_label || "Mon"} />
-      </FormGrid>
-      <div className="mt-5">
-        <AdminSwitch name="is_rest" label={t.admin.restDay} defaultChecked={data?.is_rest} />
-      </div>
-    </FormShell>
+    <div>
+      <BackLink href="/admin/member-portal/schedules" />
+      <FormShell
+        title={data ? `${data.program_title} W${data.week_number}` : t.admin.newItem}
+        onSubmit={onSubmit}
+        pending={form.pending}
+        error={form.error}
+        notice={form.notice}
+        onDelete={
+          id
+            ? async () => {
+                if (!window.confirm(t.admin.remove)) return;
+                await deleteAdminSchedule(id);
+                router.push("/admin/member-portal/schedules");
+              }
+            : undefined
+        }
+      >
+        <FormGrid>
+          <label className="grid gap-1.5">
+            <span className="text-[12px] font-medium text-neutral-500">{t.admin.programs}</span>
+            <select
+              name="program"
+              defaultValue={data?.program || programs.data?.[0]?.id || ""}
+              className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
+              required
+            >
+              {(programs.data || []).map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1.5">
+            <span className="text-[12px] font-medium text-neutral-500">{t.admin.portalWorkouts}</span>
+            <select
+              name="workout"
+              defaultValue={data?.workout || ""}
+              className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
+            >
+              <option value="">—</option>
+              {(workouts.data || []).map((workout) => (
+                <option key={workout.id} value={workout.id}>
+                  {workout.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <AdminField name="week_number" label={t.admin.weekField} type="number" defaultValue={String(data?.week_number || 1)} />
+          <AdminField name="day_index" label={t.admin.dayIndexField} type="number" defaultValue={String(data?.day_index ?? 0)} />
+          <AdminField name="day_label" label={t.admin.dayLabelField} defaultValue={data?.day_label || "Mon"} />
+        </FormGrid>
+        <div className="mt-5">
+          <AdminSwitch name="is_rest" label={t.admin.restDay} defaultChecked={data?.is_rest} />
+        </div>
+      </FormShell>
+    </div>
   );
 }
 
@@ -750,6 +765,7 @@ export function AdminNutritionList() {
   if (!data) return <p>{t.admin.loadError}</p>;
   return (
     <div>
+      <BackLink href="/admin/member-portal" />
       <ListHeader title={t.admin.portalNutrition} href="/admin/member-portal/nutrition/new" create={t.admin.newItem} />
       <TableCard>
         {data.length === 0 ? <p className="p-6 text-neutral-500">{t.admin.empty}</p> : null}
@@ -854,56 +870,59 @@ export function AdminNutritionForm({ id }: { id?: number }) {
   }
 
   return (
-    <FormShell
-      title={data?.title || t.admin.newItem}
-      onSubmit={onSubmit}
-      pending={form.pending}
-      error={form.error}
-      notice={form.notice}
-      onDelete={
-        id
-          ? async () => {
-              if (!window.confirm(t.admin.remove)) return;
-              await deleteAdminNutritionPlan(id);
-              router.push("/admin/member-portal/nutrition");
-            }
-          : undefined
-      }
-    >
-      <FormGrid>
-        <AdminField name="title" label={t.admin.titleField} defaultValue={data?.title} required />
-        <label className="grid gap-1.5">
-          <span className="text-[12px] font-medium text-neutral-500">{t.admin.programs}</span>
-          <select
-            name="program"
-            defaultValue={data?.program || programs.data?.[0]?.id || ""}
-            className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
-            required
-          >
-            {(programs.data || []).map((program) => (
-              <option key={program.id} value={program.id}>
-                {program.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <AdminField name="calories" label="Calories" type="number" defaultValue={String(data?.calories || "")} />
-        <AdminField name="protein_g" label="Protein g" type="number" defaultValue={String(data?.protein_g || "")} />
-        <AdminField name="carbs_g" label="Carbs g" type="number" defaultValue={String(data?.carbs_g || "")} />
-        <AdminField name="fats_g" label="Fats g" type="number" defaultValue={String(data?.fats_g || "")} />
-      </FormGrid>
-      <div className="mt-4 grid gap-4">
-        <AdminArea name="overview" label={t.admin.lead} defaultValue={data?.overview} />
-        <AdminArea name="coach_notes" label={t.admin.coachNotes} defaultValue={data?.coach_notes} />
-        <AdminArea
-          name="day_rows"
-          label={t.admin.nutritionDays}
-          defaultValue={defaultDays}
-          placeholder={"Day 1 => Breakfast::Eggs || Lunch::Chicken"}
-        />
-        <AdminArea name="note_rows" label={t.admin.nutritionNotes} defaultValue={defaultNotes} />
-      </div>
-    </FormShell>
+    <div>
+      <BackLink href="/admin/member-portal/nutrition" />
+      <FormShell
+        title={data?.title || t.admin.newItem}
+        onSubmit={onSubmit}
+        pending={form.pending}
+        error={form.error}
+        notice={form.notice}
+        onDelete={
+          id
+            ? async () => {
+                if (!window.confirm(t.admin.remove)) return;
+                await deleteAdminNutritionPlan(id);
+                router.push("/admin/member-portal/nutrition");
+              }
+            : undefined
+        }
+      >
+        <FormGrid>
+          <AdminField name="title" label={t.admin.titleField} defaultValue={data?.title} required />
+          <label className="grid gap-1.5">
+            <span className="text-[12px] font-medium text-neutral-500">{t.admin.programs}</span>
+            <select
+              name="program"
+              defaultValue={data?.program || programs.data?.[0]?.id || ""}
+              className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
+              required
+            >
+              {(programs.data || []).map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <AdminField name="calories" label="Calories" type="number" defaultValue={String(data?.calories || "")} />
+          <AdminField name="protein_g" label="Protein g" type="number" defaultValue={String(data?.protein_g || "")} />
+          <AdminField name="carbs_g" label="Carbs g" type="number" defaultValue={String(data?.carbs_g || "")} />
+          <AdminField name="fats_g" label="Fats g" type="number" defaultValue={String(data?.fats_g || "")} />
+        </FormGrid>
+        <div className="mt-4 grid gap-4">
+          <AdminArea name="overview" label={t.admin.lead} defaultValue={data?.overview} />
+          <AdminArea name="coach_notes" label={t.admin.coachNotes} defaultValue={data?.coach_notes} />
+          <AdminArea
+            name="day_rows"
+            label={t.admin.nutritionDays}
+            defaultValue={defaultDays}
+            placeholder={"Day 1 => Breakfast::Eggs || Lunch::Chicken"}
+          />
+          <AdminArea name="note_rows" label={t.admin.nutritionNotes} defaultValue={defaultNotes} />
+        </div>
+      </FormShell>
+    </div>
   );
 }
 
@@ -914,6 +933,7 @@ export function AdminAccessList() {
   if (!data) return <p>{t.admin.loadError}</p>;
   return (
     <div>
+      <BackLink href="/admin/member-portal" />
       <ListHeader title={t.admin.portalAccess} href="/admin/member-portal/access/new" create={t.admin.newItem} />
       <TableCard>
         {data.length === 0 ? <p className="p-6 text-neutral-500">{t.admin.empty}</p> : null}
@@ -984,22 +1004,24 @@ export function AdminAccessForm({ id }: { id?: number }) {
   }
 
   return (
-    <FormShell
-      title={data?.user_email || t.admin.newItem}
-      onSubmit={onSubmit}
-      pending={form.pending}
-      error={form.error}
-      notice={form.notice}
-      onDelete={
-        id
-          ? async () => {
-              if (!window.confirm(t.admin.remove)) return;
-              await deleteAdminSubscription(id);
-              router.push("/admin/member-portal/access");
-            }
-          : undefined
-      }
-    >
+    <div>
+      <BackLink href="/admin/member-portal/access" />
+      <FormShell
+        title={data?.user_email || t.admin.newItem}
+        onSubmit={onSubmit}
+        pending={form.pending}
+        error={form.error}
+        notice={form.notice}
+        onDelete={
+          id
+            ? async () => {
+                if (!window.confirm(t.admin.remove)) return;
+                await deleteAdminSubscription(id);
+                router.push("/admin/member-portal/access");
+              }
+            : undefined
+        }
+      >
       <FormGrid>
         <label className="grid gap-1.5">
           <span className="text-[12px] font-medium text-neutral-500">{t.admin.clients}</span>
@@ -1054,6 +1076,7 @@ export function AdminAccessForm({ id }: { id?: number }) {
       <div className="mt-4">
         <AdminArea name="coach_note" label={t.admin.coachNotes} defaultValue={data?.coach_note} />
       </div>
-    </FormShell>
+      </FormShell>
+    </div>
   );
 }

@@ -32,6 +32,16 @@ export function uploadAdminImage(file: File) {
   });
 }
 
+export function uploadAdminVideo(file: File) {
+  const body = new FormData();
+  body.append("file", file);
+  return apiFetch<{ url: string; path: string }>("/admin/uploads/video/", {
+    method: "POST",
+    body,
+    timeoutMs: 120000,
+  });
+}
+
 export const getAdminOverview = () => apiFetch<AdminOverview>("/admin/overview/");
 export const getAdminPrograms = () => apiFetch<AdminProgram[]>("/admin/programs/");
 export const getAdminProgram = (id: number) => apiFetch<AdminProgram>(`/admin/programs/${id}/`);

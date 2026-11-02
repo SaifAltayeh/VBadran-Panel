@@ -286,7 +286,7 @@ export function AdminProgramForm({ id }: { id?: number }) {
         <AdminField name="image_alt" label="Image alt" defaultValue={data?.image_alt} />
       </FormGrid>
       <div className="mt-4">
-        <ImageField name="featured_image" label={t.admin.imagePath} defaultValue={data?.featured_image} />
+        <ImageField name="featured_image" label={t.admin.imagePath} defaultValue={data?.featured_image} preset="program" />
       </div>
       <div className="mt-4 grid gap-4">
         <AdminField name="short_description" label="Short description" defaultValue={data?.short_description} />
@@ -529,9 +529,9 @@ export function AdminTransformationForm({ id }: { id?: number }) {
         <AdminField name="order" label="Order" type="number" defaultValue={String(data?.order || 0)} />
       </FormGrid>
       <div className="mt-4 grid gap-4">
-        <ImageField name="before_image" label="Before image" defaultValue={data?.before_image} />
-        <ImageField name="after_image" label="After image" defaultValue={data?.after_image} />
-        <ImageField name="cover_image" label="Cover image" defaultValue={data?.cover_image} />
+        <ImageField name="before_image" label="Before image" defaultValue={data?.before_image} preset="transformation" />
+        <ImageField name="after_image" label="After image" defaultValue={data?.after_image} preset="transformation" />
+        <ImageField name="cover_image" label="Cover image" defaultValue={data?.cover_image} preset="transformation" />
         <AdminField name="result_summary" label="Summary" defaultValue={data?.result_summary} />
         <AdminField name="image_alt" label="Image alt" defaultValue={data?.image_alt} />
         <AdminArea name="story" label="Story" defaultValue={data?.story} />
@@ -625,10 +625,12 @@ export function AdminTestimonialForm({ id }: { id?: number }) {
       <FormGrid>
         <AdminField name="client_name" label="Name" defaultValue={data?.client_name} required />
         <AdminField name="program_name" label="Program" defaultValue={data?.program_name} />
-        <AdminField name="photo" label="Photo" defaultValue={data?.photo} />
         <AdminField name="rating" label="Rating" type="number" defaultValue={String(data?.rating || 5)} />
         <AdminField name="order" label="Order" type="number" defaultValue={String(data?.order || 0)} />
       </FormGrid>
+      <div className="mt-4">
+        <ImageField name="photo" label="Photo" defaultValue={data?.photo} preset="testimonial" />
+      </div>
       <div className="mt-4">
         <AdminArea name="quote" label="Quote" defaultValue={data?.quote} />
         <div className="mt-4">

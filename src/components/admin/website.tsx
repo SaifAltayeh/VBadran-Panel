@@ -303,7 +303,7 @@ export function AdminWebsiteView() {
 
       <Panel id="hero" active={active} title={t.admin.heroBanner} switchName="hero_visible" visible={hero.visible}>
         <AdminGroup title={t.admin.media}>
-          <ImageField name="hero_image" label={t.admin.imagePath} defaultValue={hero.image} />
+          <ImageField name="hero_image" label={t.admin.imagePath} defaultValue={hero.image} preset="hero" />
           <AdminPair nameEn="hero_alt_en" nameAr="hero_alt_ar" label={t.admin.imageAlt} defaultEn={hero.alt.en} defaultAr={hero.alt.ar} />
         </AdminGroup>
         <AdminGroup title={t.admin.copyGroup}>
@@ -351,7 +351,7 @@ export function AdminWebsiteView() {
           ))}
         </AdminGroup>
         <AdminGroup title={t.admin.aboutPage}>
-          <ImageField name="page_about_image" label={t.admin.imagePath} defaultValue={pages.about.image} />
+          <ImageField name="page_about_image" label={t.admin.imagePath} defaultValue={pages.about.image} preset="about" />
           <AdminPair nameEn="page_about_alt_en" nameAr="page_about_alt_ar" label={t.admin.imageAlt} defaultEn={pages.about.imageAlt.en} defaultAr={pages.about.imageAlt.ar} />
           <AdminPair nameEn="page_about_k_en" nameAr="page_about_k_ar" label={t.admin.kickerField} defaultEn={pages.about.kicker.en} defaultAr={pages.about.kicker.ar} />
           <AdminPair nameEn="page_about_n_en" nameAr="page_about_n_ar" label={t.admin.nameField} defaultEn={pages.about.name.en} defaultAr={pages.about.name.ar} />
@@ -362,7 +362,7 @@ export function AdminWebsiteView() {
         <AdminGroup title={t.admin.story}>
           <AdminPair nameEn="page_about_sk_en" nameAr="page_about_sk_ar" label={t.admin.kickerField} defaultEn={pages.about.storyKicker.en} defaultAr={pages.about.storyKicker.ar} />
           <AdminPair nameEn="page_about_sh_en" nameAr="page_about_sh_ar" label={t.admin.headingField} defaultEn={pages.about.storyHeading.en} defaultAr={pages.about.storyHeading.ar} />
-          <ImageField name="page_about_simage" label={t.admin.imagePath} defaultValue={pages.about.storyImage} />
+          <ImageField name="page_about_simage" label={t.admin.imagePath} defaultValue={pages.about.storyImage} preset="about" />
           <AdminPair nameEn="page_about_salt_en" nameAr="page_about_salt_ar" label={t.admin.imageAlt} defaultEn={pages.about.storyImageAlt.en} defaultAr={pages.about.storyImageAlt.ar} />
           {pages.about.chapters.map((chapter, index) => (
             <AdminGroup key={index} title={`${t.admin.chapter} ${index + 1}`}>

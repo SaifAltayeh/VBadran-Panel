@@ -14,7 +14,7 @@ import { apiFetch } from "./client";
 
 export const getAdminSite = () => apiFetch<SiteHome>("/admin/site/").then(mergeSiteHome);
 export const updateAdminSite = (payload: Partial<SiteHome>) =>
-  apiFetch<SiteHome>("/admin/site/", { method: "PATCH", body: JSON.stringify(payload) });
+  apiFetch<SiteHome>("/admin/site/", { method: "PATCH", body: JSON.stringify(payload) }).then(mergeSiteHome);
 
 export function uploadAdminImage(file: File) {
   const body = new FormData();

@@ -201,9 +201,10 @@ export function AdminProgramForm({ id }: { id?: number }) {
   const { t, arabic } = useLang();
   const router = useRouter();
   const loader = useCallback(() => (id ? getAdminProgram(id) : Promise.resolve(null)), [id]);
-  const { status, data } = useResource(loader);
+  const { status, data, setData, reload } = useResource(loader);
   const form = useFormState();
-  if (id && status === "loading") return <Skeleton className="h-48 w-full rounded-[24px]" />;
+  const [formKey, setFormKey] = useState(0);
+  if (id && status === "loading" && !data) return <Skeleton className="h-48 w-full rounded-[24px]" />;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -235,8 +236,12 @@ export function AdminProgramForm({ id }: { id?: number }) {
     form.setPending(true);
     form.setError("");
     try {
-      if (id) await updateAdminProgram(id, payload);
-      else {
+      if (id) {
+        const saved = await updateAdminProgram(id, payload);
+        setData(saved);
+        setFormKey((current) => current + 1);
+        reload();
+      } else {
         const created = await createAdminProgram(payload);
         router.replace(`/admin/programs/${created.id}`);
       }
@@ -255,7 +260,7 @@ export function AdminProgramForm({ id }: { id?: number }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-[24px] bg-white p-5 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.28)] md:p-8">
+    <form key={formKey} onSubmit={onSubmit} className="rounded-[24px] bg-white p-5 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.28)] md:p-8">
       <DashTitle arabic={arabic}>{data?.title || t.admin.newItem}</DashTitle>
       <FormGrid>
         <AdminField name="title" label="Title" defaultValue={data?.title} required />
@@ -452,9 +457,10 @@ export function AdminTransformationForm({ id }: { id?: number }) {
   const { t, arabic } = useLang();
   const router = useRouter();
   const loader = useCallback(() => (id ? getAdminTransformation(id) : Promise.resolve(null)), [id]);
-  const { status, data } = useResource(loader);
+  const { status, data, setData, reload } = useResource(loader);
   const form = useFormState();
-  if (id && status === "loading") return <Skeleton className="h-48 w-full rounded-[24px]" />;
+  const [formKey, setFormKey] = useState(0);
+  if (id && status === "loading" && !data) return <Skeleton className="h-48 w-full rounded-[24px]" />;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -477,8 +483,12 @@ export function AdminTransformationForm({ id }: { id?: number }) {
     form.setPending(true);
     form.setError("");
     try {
-      if (id) await updateAdminTransformation(id, payload);
-      else {
+      if (id) {
+        const saved = await updateAdminTransformation(id, payload);
+        setData(saved);
+        setFormKey((current) => current + 1);
+        reload();
+      } else {
         const created = await createAdminTransformation(payload);
         router.replace(`/admin/transformations/${created.id}`);
       }
@@ -497,7 +507,7 @@ export function AdminTransformationForm({ id }: { id?: number }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-[24px] bg-white p-5 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.28)] md:p-8">
+    <form key={formKey} onSubmit={onSubmit} className="rounded-[24px] bg-white p-5 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.28)] md:p-8">
       <DashTitle arabic={arabic}>{data?.client_name || t.admin.newItem}</DashTitle>
       <FormGrid>
         <AdminField name="client_name" label="Name" defaultValue={data?.client_name} required />

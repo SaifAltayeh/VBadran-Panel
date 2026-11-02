@@ -1,7 +1,7 @@
 "use client";
 
 import { ImageIcon, Upload } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AdminField } from "@/components/admin/fields";
 import { errorMessage } from "@/lib/api";
@@ -32,13 +32,18 @@ export function ImageField({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    setSrc(defaultValue || "");
+  }, [defaultValue]);
+
   async function onPick(file: File | null) {
     if (!file) return;
     setPending(true);
     setError("");
     try {
       const uploaded = await uploadAdminImage(file);
-      setSrc(uploaded.url || uploaded.path);
+      const next = uploaded.url || uploaded.path;
+      setSrc(next);
     } catch (err) {
       setError(errorMessage(err, arabic ? "تعذّر رفع الصورة." : "Could not upload the image."));
     } finally {
@@ -51,7 +56,7 @@ export function ImageField({
       <div className="overflow-hidden rounded-[18px] border border-[#e6ecf4] bg-white">
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={previewSrc(src)} alt={t.admin.imagePreview} className="h-28 w-full object-cover" />
+          <img key={src.slice(0, 64)} src={previewSrc(src)} alt={t.admin.imagePreview} className="h-28 w-full object-cover" />
         ) : (
           <div className="flex h-28 flex-col items-center justify-center gap-2 text-neutral-400">
             <ImageIcon className="h-5 w-5" />
@@ -92,6 +97,9 @@ export function ImageField({
             }}
           />
         </label>
+        <p className={`text-xs text-neutral-400 ${arabic ? "font-arabic" : "font-sans tracking-normal [word-spacing:0.06em]"}`}>
+          {arabic ? "ارفع الصورة ثم اضغط حفظ التغييرات." : "Upload the image, then click Save changes."}
+        </p>
         {error ? <p className={`text-sm text-primary ${arabic ? "font-arabic" : ""}`}>{error}</p> : null}
       </div>
     </div>

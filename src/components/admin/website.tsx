@@ -46,13 +46,14 @@ function Panel({
 export function AdminWebsiteView() {
   const { t, arabic } = useLang();
   const loader = useCallback(() => getAdminSite(), []);
-  const { status, data } = useResource(loader);
+  const { status, data, setData, reload } = useResource(loader);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [active, setActive] = useState<SectionId>("hero");
+  const [formKey, setFormKey] = useState(0);
 
-  if (status === "loading") return <Skeleton className="h-64 w-full rounded-[24px]" />;
+  if (status === "loading" && !data) return <Skeleton className="h-64 w-full rounded-[24px]" />;
   if (!data) return <p className={arabic ? "font-arabic" : ""}>{t.admin.loadError}</p>;
 
   const hero = data.hero;
@@ -242,8 +243,11 @@ export function AdminWebsiteView() {
     setPending(true);
     setError("");
     try {
-      await updateAdminSite(payload);
+      const saved = await updateAdminSite(payload);
+      setData(saved);
+      setFormKey((current) => current + 1);
       setNotice(t.admin.saved);
+      reload();
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -267,7 +271,7 @@ export function AdminWebsiteView() {
   ];
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5 pb-4">
+    <form key={formKey} onSubmit={onSubmit} className="space-y-5 pb-4">
       <div>
         <h2 className={`text-[28px] font-semibold tracking-normal [word-spacing:0.06em] ${arabic ? "font-arabic" : "font-sans"}`}>
           {t.admin.website}

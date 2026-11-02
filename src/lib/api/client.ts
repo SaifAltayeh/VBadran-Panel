@@ -40,20 +40,38 @@ function isArabic() {
   return typeof document !== "undefined" && document.documentElement.lang === "ar";
 }
 
+function fieldErrors(body: Record<string, unknown>) {
+  const parts: string[] = [];
+  for (const [key, value] of Object.entries(body)) {
+    if (key === "detail") continue;
+    if (Array.isArray(value)) {
+      const text = value.filter((item) => typeof item === "string").join(" ");
+      if (text) parts.push(`${key}: ${text}`);
+    } else if (typeof value === "string" && value) {
+      parts.push(`${key}: ${value}`);
+    }
+  }
+  return parts.join(" · ");
+}
+
 export function errorMessage(error: unknown, fallback?: string) {
   const ar = isArabic();
   if (error instanceof ApiError) {
-    if (typeof error.body === "object" && error.body && "detail" in error.body) {
-      const detail = (error.body as { detail: unknown }).detail;
-      if (typeof detail === "string") {
+    if (typeof error.body === "object" && error.body) {
+      const body = error.body as Record<string, unknown>;
+      if (typeof body.detail === "string") {
+        const detail = body.detail;
         if (/no active account/i.test(detail) || /credentials/i.test(detail)) {
           return ar ? "البريد أو كلمة المرور غير صحيحة." : "Email or password is incorrect.";
         }
         return loc(ar, detail) || detail;
       }
+      const fields = fieldErrors(body);
+      if (fields) return fields;
     }
     if (error.status === 401) return ar ? "البريد أو كلمة المرور غير صحيحة." : "Email or password is incorrect.";
     if (error.status === 400) return ar ? "راجع النموذج وحاول مرة أخرى." : "Check the form and try again.";
+    if (error.status === 413) return ar ? "الملف أو البيانات كبيرة جداً." : "The image or data is too large.";
   }
   if (isNetworkError(error)) return ar ? "تعذّر الوصول إلى الخادم." : "We could not reach the server.";
   return fallback ?? (ar ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again.");

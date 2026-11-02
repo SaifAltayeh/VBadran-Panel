@@ -3,7 +3,6 @@
 import { ImageIcon, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { AdminField } from "@/components/admin/fields";
 import { errorMessage } from "@/lib/api";
 import { uploadAdminImage } from "@/lib/api/admin";
 import { useLang } from "@/lib/i18n";
@@ -16,6 +15,13 @@ function previewSrc(value: string) {
   const api = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001/api").replace(/\/api\/?$/, "");
   if (value.startsWith("/media/")) return `${api}${value}`;
   return `${site}${value}`;
+}
+
+function displayPath(value: string) {
+  if (!value) return "";
+  if (value.startsWith("data:")) return "Uploaded image ready";
+  if (value.length > 64) return `${value.slice(0, 48)}…`;
+  return value;
 }
 
 export function ImageField({
@@ -66,19 +72,20 @@ export function ImageField({
           </div>
         )}
       </div>
-      <div className="grid gap-3">
-        <AdminField
-          name={name}
-          label={label}
-          value={src}
-          dir="ltr"
-          icon={<ImageIcon className="h-4 w-4" />}
-          placeholder="/images/hero/banner.jpg"
-          onChange={(event) => setSrc(event.target.value)}
-        />
+      <div className="grid min-w-0 gap-3">
+        <input type="hidden" name={name} value={src} />
+        <label className="grid min-w-0 gap-1.5">
+          <span className={`text-[12px] font-medium text-neutral-500 ${arabic ? "font-arabic" : "font-sans tracking-normal [word-spacing:0.06em]"}`}>
+            {label}
+          </span>
+          <span className="flex h-12 min-w-0 items-center gap-2.5 overflow-hidden rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] text-neutral-500">
+            <ImageIcon className="h-4 w-4 shrink-0 text-neutral-400" />
+            <span className="min-w-0 truncate">{displayPath(src) || "/images/…"}</span>
+          </span>
+        </label>
         <label
           className={cn(
-            "inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#d7e0ee] bg-[#f7f9fc] px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#eef3ff]",
+            "relative inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#d7e0ee] bg-[#f7f9fc] px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#eef3ff]",
             arabic ? "font-arabic" : "font-sans tracking-normal [word-spacing:0.06em]",
             pending ? "pointer-events-none opacity-60" : "",
           )}
@@ -88,7 +95,7 @@ export function ImageField({
           <input
             type="file"
             accept="image/*"
-            className="sr-only"
+            className="absolute inset-0 cursor-pointer opacity-0"
             disabled={pending}
             onChange={(event) => {
               const file = event.target.files?.[0] || null;

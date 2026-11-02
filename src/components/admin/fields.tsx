@@ -197,18 +197,37 @@ export function AdminSwitch({
   onChange?: (value: boolean) => void;
 }) {
   const { arabic } = useLang();
+  const [on, setOn] = useState(Boolean(checked ?? defaultChecked));
+  useEffect(() => {
+    if (checked !== undefined) setOn(checked);
+  }, [checked]);
+  const active = checked ?? on;
   return (
-    <label className="inline-flex cursor-pointer items-center gap-2.5" onClick={(event) => event.stopPropagation()}>
+    <label className="relative inline-flex cursor-pointer items-center gap-2.5">
       <input
         type="checkbox"
         name={name}
-        defaultChecked={checked === undefined ? defaultChecked : undefined}
-        checked={checked}
-        onChange={onChange ? (event) => onChange(event.target.checked) : undefined}
-        className="peer sr-only"
+        checked={active}
+        onChange={(event) => {
+          const next = event.target.checked;
+          if (checked === undefined) setOn(next);
+          onChange?.(next);
+        }}
+        className="peer absolute inset-0 z-10 m-0 h-full w-full cursor-pointer opacity-0"
       />
-      <span className="relative h-6 w-11 rounded-full bg-[#d7deea] transition-colors peer-checked:bg-primary peer-checked:[&>span]:start-5 peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30">
-        <span className="absolute top-0.5 start-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-[inset-inline-start]" />
+      <span
+        aria-hidden
+        className={cn(
+          "relative h-6 w-11 shrink-0 rounded-full transition-colors",
+          active ? "bg-primary" : "bg-[#d7deea]",
+        )}
+      >
+        <span
+          className={cn(
+            "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-[inset-inline-start]",
+            active ? "start-5" : "start-0.5",
+          )}
+        />
       </span>
       <span className={cn("text-sm text-neutral-500", arabic ? "font-arabic" : latin)}>{label}</span>
     </label>

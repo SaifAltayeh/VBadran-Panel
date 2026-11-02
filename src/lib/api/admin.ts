@@ -29,35 +29,53 @@ export function uploadAdminImage(file: File) {
 export const getAdminOverview = () => apiFetch<AdminOverview>("/admin/overview/");
 export const getAdminPrograms = () => apiFetch<AdminProgram[]>("/admin/programs/");
 export const getAdminProgram = (id: number) => apiFetch<AdminProgram>(`/admin/programs/${id}/`);
+const writeTimeout = { timeoutMs: 45000 };
+
 export const createAdminProgram = (payload: Partial<AdminProgram>) =>
-  apiFetch<AdminProgram>("/admin/programs/", { method: "POST", body: JSON.stringify(payload) });
+  apiFetch<AdminProgram>("/admin/programs/", { method: "POST", body: JSON.stringify(payload), ...writeTimeout });
 export const updateAdminProgram = (id: number, payload: Partial<AdminProgram>) =>
-  apiFetch<AdminProgram>(`/admin/programs/${id}/`, { method: "PATCH", body: JSON.stringify(payload) });
+  apiFetch<AdminProgram>(`/admin/programs/${id}/`, { method: "PATCH", body: JSON.stringify(payload), ...writeTimeout });
 export const deleteAdminProgram = (id: number) => apiFetch<void>(`/admin/programs/${id}/`, { method: "DELETE" });
 
 export const getAdminPackages = () => apiFetch<AdminPackage[]>("/admin/packages/");
 export const getAdminPackage = (id: number) => apiFetch<AdminPackage>(`/admin/packages/${id}/`);
 export const createAdminPackage = (payload: Partial<AdminPackage>) =>
-  apiFetch<AdminPackage>("/admin/packages/", { method: "POST", body: JSON.stringify(payload) });
+  apiFetch<AdminPackage>("/admin/packages/", { method: "POST", body: JSON.stringify(payload), ...writeTimeout });
 export const updateAdminPackage = (id: number, payload: Partial<AdminPackage>) =>
-  apiFetch<AdminPackage>(`/admin/packages/${id}/`, { method: "PATCH", body: JSON.stringify(payload) });
+  apiFetch<AdminPackage>(`/admin/packages/${id}/`, { method: "PATCH", body: JSON.stringify(payload), ...writeTimeout });
 export const deleteAdminPackage = (id: number) => apiFetch<void>(`/admin/packages/${id}/`, { method: "DELETE" });
 
 export const getAdminTransformations = () => apiFetch<AdminTransformation[]>("/admin/transformations/");
 export const getAdminTransformation = (id: number) => apiFetch<AdminTransformation>(`/admin/transformations/${id}/`);
 export const createAdminTransformation = (payload: Partial<AdminTransformation>) =>
-  apiFetch<AdminTransformation>("/admin/transformations/", { method: "POST", body: JSON.stringify(payload) });
+  apiFetch<AdminTransformation>("/admin/transformations/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
 export const updateAdminTransformation = (id: number, payload: Partial<AdminTransformation>) =>
-  apiFetch<AdminTransformation>(`/admin/transformations/${id}/`, { method: "PATCH", body: JSON.stringify(payload) });
+  apiFetch<AdminTransformation>(`/admin/transformations/${id}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
 export const deleteAdminTransformation = (id: number) =>
   apiFetch<void>(`/admin/transformations/${id}/`, { method: "DELETE" });
 
 export const getAdminTestimonials = () => apiFetch<AdminTestimonial[]>("/admin/testimonials/");
 export const getAdminTestimonial = (id: number) => apiFetch<AdminTestimonial>(`/admin/testimonials/${id}/`);
 export const createAdminTestimonial = (payload: Partial<AdminTestimonial>) =>
-  apiFetch<AdminTestimonial>("/admin/testimonials/", { method: "POST", body: JSON.stringify(payload) });
+  apiFetch<AdminTestimonial>("/admin/testimonials/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
 export const updateAdminTestimonial = (id: number, payload: Partial<AdminTestimonial>) =>
-  apiFetch<AdminTestimonial>(`/admin/testimonials/${id}/`, { method: "PATCH", body: JSON.stringify(payload) });
+  apiFetch<AdminTestimonial>(`/admin/testimonials/${id}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
 export const deleteAdminTestimonial = (id: number) => apiFetch<void>(`/admin/testimonials/${id}/`, { method: "DELETE" });
 
 export const getAdminInquiries = () => apiFetch<AdminInquiry[]>("/admin/inquiries/");

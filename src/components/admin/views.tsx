@@ -48,6 +48,11 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
+function uniqueSlug(value: string, title: string) {
+  const base = slugify(value || title) || `item-${Date.now().toString(36)}`;
+  return value.trim() ? base : `${base}-${Date.now().toString(36).slice(-4)}`;
+}
+
 function FormGrid({ children }: { children: React.ReactNode }) {
   return <div className="mt-6 grid gap-4 md:grid-cols-2">{children}</div>;
 }
@@ -209,18 +214,22 @@ export function AdminProgramForm({ id }: { id?: number }) {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const raw = new FormData(event.currentTarget);
-    const title = String(raw.get("title") || "");
+    const title = String(raw.get("title") || "").trim();
+    if (!title) {
+      form.setError(arabic ? "العنوان مطلوب." : "Title is required.");
+      return;
+    }
     const payload = {
       title,
-      slug: String(raw.get("slug") || slugify(title)),
-      short_description: String(raw.get("short_description") || ""),
-      description: String(raw.get("description") || ""),
+      slug: id ? String(raw.get("slug") || slugify(title)) || slugify(title) : uniqueSlug(String(raw.get("slug") || ""), title),
+      short_description: String(raw.get("short_description") || title),
+      description: String(raw.get("description") || title),
       price: String(raw.get("price") || "0"),
       currency: String(raw.get("currency") || "USD"),
-      duration_weeks: Number(raw.get("duration_weeks") || 12),
+      duration_weeks: Number(raw.get("duration_weeks") || 12) || 12,
       difficulty: String(raw.get("difficulty") || "all"),
       category: String(raw.get("category") || "online-coaching"),
-      goal: String(raw.get("goal") || "General"),
+      goal: String(raw.get("goal") || title),
       featured_image: String(raw.get("featured_image") || ""),
       image_alt: String(raw.get("image_alt") || ""),
       expected_outcome: String(raw.get("expected_outcome") || ""),
@@ -235,6 +244,7 @@ export function AdminProgramForm({ id }: { id?: number }) {
     };
     form.setPending(true);
     form.setError("");
+    form.setNotice("");
     try {
       if (id) {
         const saved = await updateAdminProgram(id, payload);
@@ -243,7 +253,9 @@ export function AdminProgramForm({ id }: { id?: number }) {
         reload();
       } else {
         const created = await createAdminProgram(payload);
+        form.setNotice(t.admin.saved);
         router.replace(`/admin/programs/${created.id}`);
+        return;
       }
       form.setNotice(t.admin.saved);
     } catch (err) {

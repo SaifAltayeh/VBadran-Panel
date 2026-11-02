@@ -1,0 +1,6 @@
+import { AdminScheduleForm } from "@/components/admin/member-portal";
+
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <AdminScheduleForm id={Number(id)} />;
+}

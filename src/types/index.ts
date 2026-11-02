@@ -374,3 +374,111 @@ export type AdminClient = {
   phone: string;
   goal: string;
 };
+
+export type AdminExercise = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  video_url: string;
+  thumbnail: string;
+  image_alt: string;
+  muscle_group: string;
+  difficulty: string;
+  instructions: string;
+  tips: string;
+};
+
+export type AdminPortalVideo = {
+  id: number;
+  program: number;
+  program_title: string;
+  title: string;
+  description: string;
+  video_url: string;
+  thumbnail: string;
+  order: number;
+  is_active: boolean;
+};
+
+export type AdminWorkoutItem = {
+  id?: number;
+  exercise_id: number;
+  exercise_name?: string;
+  sets: string;
+  reps: string;
+  rest_seconds: number;
+  tempo: string;
+  notes: string;
+  order: number;
+};
+
+export type AdminWorkout = {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  duration_minutes: number;
+  focus: string;
+  coach_notes: string;
+  warmup: string;
+  items: AdminWorkoutItem[];
+};
+
+export type AdminSchedule = {
+  id: number;
+  program: number;
+  program_title: string;
+  workout: number | null;
+  workout_title: string | null;
+  week_number: number;
+  day_index: number;
+  day_label: string;
+  is_rest: boolean;
+};
+
+export type AdminNutritionMeal = {
+  id?: number;
+  name: string;
+  suggestion: string;
+  order: number;
+};
+
+export type AdminNutritionDay = {
+  id?: number;
+  name: string;
+  order: number;
+  meals: AdminNutritionMeal[];
+};
+
+export type AdminNutritionPlan = {
+  id: number;
+  program: number;
+  program_title: string;
+  title: string;
+  overview: string;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fats_g: number | null;
+  coach_notes: string;
+  download_label: string;
+  download_url: string;
+  days: AdminNutritionDay[];
+  notes: { id?: number; body: string; order?: number }[];
+};
+
+export type AdminSubscription = {
+  id: number;
+  user: number;
+  user_email: string;
+  user_name: string;
+  program: number;
+  program_title: string;
+  order: number | null;
+  status: "pending" | "active" | "cancelled" | "expired";
+  start_date: string;
+  end_date: string;
+  coach_note: string;
+  created_at: string;
+};

@@ -9,6 +9,7 @@ import {
   PanelsTopLeft,
   Search,
   StretchHorizontal,
+  TabletSmartphone,
   UserRound,
   Users,
 } from "lucide-react";
@@ -26,6 +27,7 @@ const hrefs = [
   { href: "/admin/website", key: "website", icon: PanelsTopLeft },
   { href: "/admin/programs", key: "programs", icon: StretchHorizontal },
   { href: "/admin/packages", key: "packages", icon: Package },
+  { href: "/admin/member-portal", key: "memberPortal", icon: TabletSmartphone },
   { href: "/admin/transformations", key: "transformations", icon: Users },
   { href: "/admin/testimonials", key: "testimonials", icon: MessagesSquare },
   { href: "/admin/inquiries", key: "inquiries", icon: Mail },

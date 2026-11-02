@@ -1,11 +1,17 @@
 import type {
   AdminClient,
+  AdminExercise,
   AdminInquiry,
+  AdminNutritionPlan,
   AdminOverview,
   AdminPackage,
+  AdminPortalVideo,
   AdminProgram,
+  AdminSchedule,
+  AdminSubscription,
   AdminTestimonial,
   AdminTransformation,
+  AdminWorkout,
 } from "@/types";
 
 import { mergeSiteHome, type SiteHome } from "@/lib/site-home";
@@ -83,6 +89,76 @@ export const updateAdminInquiry = (id: number, payload: Partial<AdminInquiry>) =
   apiFetch<AdminInquiry>(`/admin/inquiries/${id}/`, { method: "PATCH", body: JSON.stringify(payload) });
 
 export const getAdminClients = () => apiFetch<AdminClient[]>("/admin/clients/");
+
+export const getAdminExercises = () => apiFetch<AdminExercise[]>("/admin/exercises/");
+export const getAdminExercise = (id: number) => apiFetch<AdminExercise>(`/admin/exercises/${id}/`);
+export const createAdminExercise = (payload: Partial<AdminExercise>) =>
+  apiFetch<AdminExercise>("/admin/exercises/", { method: "POST", body: JSON.stringify(payload), ...writeTimeout });
+export const updateAdminExercise = (id: number, payload: Partial<AdminExercise>) =>
+  apiFetch<AdminExercise>(`/admin/exercises/${id}/`, { method: "PATCH", body: JSON.stringify(payload), ...writeTimeout });
+export const deleteAdminExercise = (id: number) => apiFetch<void>(`/admin/exercises/${id}/`, { method: "DELETE" });
+
+export const getAdminPortalVideos = () => apiFetch<AdminPortalVideo[]>("/admin/portal-videos/");
+export const getAdminPortalVideo = (id: number) => apiFetch<AdminPortalVideo>(`/admin/portal-videos/${id}/`);
+export const createAdminPortalVideo = (payload: Partial<AdminPortalVideo>) =>
+  apiFetch<AdminPortalVideo>("/admin/portal-videos/", { method: "POST", body: JSON.stringify(payload), ...writeTimeout });
+export const updateAdminPortalVideo = (id: number, payload: Partial<AdminPortalVideo>) =>
+  apiFetch<AdminPortalVideo>(`/admin/portal-videos/${id}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
+export const deleteAdminPortalVideo = (id: number) => apiFetch<void>(`/admin/portal-videos/${id}/`, { method: "DELETE" });
+
+export const getAdminWorkouts = () => apiFetch<AdminWorkout[]>("/admin/workouts/");
+export const getAdminWorkout = (id: number) => apiFetch<AdminWorkout>(`/admin/workouts/${id}/`);
+export const createAdminWorkout = (payload: Record<string, unknown>) =>
+  apiFetch<AdminWorkout>("/admin/workouts/", { method: "POST", body: JSON.stringify(payload), ...writeTimeout });
+export const updateAdminWorkout = (id: number, payload: Record<string, unknown>) =>
+  apiFetch<AdminWorkout>(`/admin/workouts/${id}/`, { method: "PATCH", body: JSON.stringify(payload), ...writeTimeout });
+export const deleteAdminWorkout = (id: number) => apiFetch<void>(`/admin/workouts/${id}/`, { method: "DELETE" });
+
+export const getAdminSchedules = () => apiFetch<AdminSchedule[]>("/admin/schedules/");
+export const getAdminSchedule = (id: number) => apiFetch<AdminSchedule>(`/admin/schedules/${id}/`);
+export const createAdminSchedule = (payload: Partial<AdminSchedule>) =>
+  apiFetch<AdminSchedule>("/admin/schedules/", { method: "POST", body: JSON.stringify(payload), ...writeTimeout });
+export const updateAdminSchedule = (id: number, payload: Partial<AdminSchedule>) =>
+  apiFetch<AdminSchedule>(`/admin/schedules/${id}/`, { method: "PATCH", body: JSON.stringify(payload), ...writeTimeout });
+export const deleteAdminSchedule = (id: number) => apiFetch<void>(`/admin/schedules/${id}/`, { method: "DELETE" });
+
+export const getAdminNutritionPlans = () => apiFetch<AdminNutritionPlan[]>("/admin/nutrition-plans/");
+export const getAdminNutritionPlan = (id: number) => apiFetch<AdminNutritionPlan>(`/admin/nutrition-plans/${id}/`);
+export const createAdminNutritionPlan = (payload: Record<string, unknown>) =>
+  apiFetch<AdminNutritionPlan>("/admin/nutrition-plans/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
+export const updateAdminNutritionPlan = (id: number, payload: Record<string, unknown>) =>
+  apiFetch<AdminNutritionPlan>(`/admin/nutrition-plans/${id}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
+export const deleteAdminNutritionPlan = (id: number) =>
+  apiFetch<void>(`/admin/nutrition-plans/${id}/`, { method: "DELETE" });
+
+export const getAdminSubscriptions = () => apiFetch<AdminSubscription[]>("/admin/subscriptions/");
+export const getAdminSubscription = (id: number) => apiFetch<AdminSubscription>(`/admin/subscriptions/${id}/`);
+export const createAdminSubscription = (payload: Partial<AdminSubscription>) =>
+  apiFetch<AdminSubscription>("/admin/subscriptions/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
+export const updateAdminSubscription = (id: number, payload: Partial<AdminSubscription>) =>
+  apiFetch<AdminSubscription>(`/admin/subscriptions/${id}/`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    ...writeTimeout,
+  });
+export const deleteAdminSubscription = (id: number) =>
+  apiFetch<void>(`/admin/subscriptions/${id}/`, { method: "DELETE" });
 
 export function isStaffSession() {
   return typeof window !== "undefined" && window.localStorage.getItem("vb_staff") === "1";

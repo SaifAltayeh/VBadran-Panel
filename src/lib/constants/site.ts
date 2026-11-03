@@ -1,12 +1,11 @@
 export const site = {
   name: "VBADRAN",
-  email: "hello@vbadran.com",
-  phoneDisplay: "+962 79 000 0000",
-  phoneHref: "tel:+962790000000",
-  whatsapp: "https://wa.me/962790000000",
-  instagram: "https://instagram.com/vbadran",
-  tiktok: "https://www.tiktok.com/@vbadran",
-  youtube: "https://youtube.com/@vbadran",
+  email: "Badranbay@gmail.com",
+  phoneDisplay: "+965 550 71251",
+  phoneHref: "tel:+96555071251",
+  whatsapp: "https://wa.me/96555071251",
+  instagram: "https://www.instagram.com/vbadrann/",
+  youtube: "https://www.youtube.com/@vbadran",
   description:
     "Personal training and online coaching from VBADRAN. Programs built around your goals, schedule, and progress.",
 };
@@ -31,7 +30,6 @@ export const footerPages = [
 
 export const socials = [
   { href: site.instagram, label: "Instagram" },
-  { href: site.tiktok, label: "TikTok" },
   { href: site.youtube, label: "YouTube" },
   { href: site.whatsapp, label: "WhatsApp" },
 ] as const;

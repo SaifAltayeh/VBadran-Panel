@@ -347,19 +347,18 @@ export const defaultSiteHome: SiteHome = {
     },
   },
   site: {
-    email: "hello@vbadran.com",
-    phoneDisplay: "+962 79 000 0000",
-    phoneHref: "tel:+962790000000",
+    email: "Badranbay@gmail.com",
+    phoneDisplay: "+965 550 71251",
+    phoneHref: "tel:+96555071251",
     footerBlurb: {
       en: "Personal training and online coaching built around your goals, schedule, and progress.",
       ar: "تدريب شخصي وتدريب عن بُعد مبني حول هدفك وجدولك وتقدّمك.",
     },
     footerTag: { en: "Personal training · Online coaching", ar: "تدريب شخصي · تدريب عن بُعد" },
     socials: [
-      { label: "Instagram", href: "https://instagram.com/vbadran" },
-      { label: "TikTok", href: "https://www.tiktok.com/@vbadran" },
-      { label: "YouTube", href: "https://youtube.com/@vbadran" },
-      { label: "WhatsApp", href: "https://wa.me/962790000000" },
+      { label: "Instagram", href: "https://www.instagram.com/vbadrann/" },
+      { label: "YouTube", href: "https://www.youtube.com/@vbadran" },
+      { label: "WhatsApp", href: "https://wa.me/96555071251" },
     ],
   },
 };
@@ -385,5 +384,25 @@ export function mergeSiteHome(incoming?: Partial<SiteHome> | null): SiteHome {
     en: localeTitle(merged.hero?.title?.en, defaultSiteHome.hero.title.en),
     ar: localeTitle(merged.hero?.title?.ar, defaultSiteHome.hero.title.ar),
   };
+  const site = merged.site || defaultSiteHome.site;
+  const hrefs = (site.socials || []).map((item) => item.href || "").join(" ");
+  const stale =
+    !site.email ||
+    site.email === "hello@vbadran.com" ||
+    (site.phoneHref || "").includes("962790000000") ||
+    /tiktok/i.test(hrefs) ||
+    (hrefs.includes("instagram.com/vbadran") && !hrefs.includes("vbadrann")) ||
+    hrefs.includes("wa.me/962");
+  if (stale) {
+    site.email = defaultSiteHome.site.email;
+    site.phoneDisplay = defaultSiteHome.site.phoneDisplay;
+    site.phoneHref = defaultSiteHome.site.phoneHref;
+    site.socials = defaultSiteHome.site.socials;
+  } else {
+    site.socials = (site.socials || []).filter(
+      (item) => !/tiktok/i.test(item.href || "") && item.label.toLowerCase() !== "tiktok",
+    );
+  }
+  merged.site = site;
   return merged;
 }

@@ -1,20 +1,21 @@
 export const site = {
-  name: "VBADRAN",
+  name: "Badran",
   email: "Badranbay@gmail.com",
   phoneDisplay: "+965 550 71251",
   phoneHref: "tel:+96555071251",
   whatsapp: "https://wa.me/96555071251",
   instagram: "https://www.instagram.com/vbadrann/",
   youtube: "https://www.youtube.com/@vbadran",
+  snapchat: "https://www.snapchat.com/@vbadranv",
+  tiktok: "https://www.tiktok.com/@o9wr",
   description:
-    "Personal training and online coaching from VBADRAN. Programs built around your goals, schedule, and progress.",
+    "Training packages, personal workout plans, and instructional exercise videos from Badran.",
 };
 
 export const nav = [
   { href: "/about", label: "About" },
   { href: "/programs", label: "Programs" },
   { href: "/transformations", label: "Transformations" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/faq", label: "FAQ" },
 ] as const;
 
@@ -23,7 +24,6 @@ export const footerPages = [
   { href: "/about", label: "About" },
   { href: "/programs", label: "Programs" },
   { href: "/transformations", label: "Transformations" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -32,6 +32,8 @@ export const socials = [
   { href: site.instagram, label: "Instagram" },
   { href: site.youtube, label: "YouTube" },
   { href: site.whatsapp, label: "WhatsApp" },
+  { href: site.snapchat, label: "Snapchat" },
+  { href: site.tiktok, label: "TikTok" },
 ] as const;
 
 export const crops: Record<string, string> = {
@@ -59,9 +61,9 @@ export const crops: Record<string, string> = {
 export const process = [
   {
     n: "01",
-    title: "Choose your program",
-    body: "Start from a clear block. Training, nutrition, or the full system.",
-    points: ["Training", "Nutrition", "Full system"],
+    title: "Choose your package",
+    body: "Choose the gym package that matches where you train.",
+    points: ["Spark", "Platinum", "Oxygen"],
   },
   {
     n: "02",
@@ -78,42 +80,42 @@ export const process = [
   {
     n: "04",
     title: "Train and track",
-    body: "Follow the work, log what matters, and keep the check-in honest.",
-    points: ["Workouts", "Check-ins", "Progress"],
+    body: "Follow your assigned workout plan and the exercise videos for your gym.",
+    points: ["Workout plan", "Exercise videos", "Progress"],
   },
   {
     n: "05",
-    title: "Adjust and progress",
-    body: "The plan changes when your recovery, calendar, or strength changes.",
-    points: ["Recovery", "Calendar", "Strength"],
+    title: "Stay consistent",
+    body: "Keep to the plan written for your package. The videos show how each movement is done.",
+    points: ["Plan", "Videos", "Consistency"],
   },
 ];
 
 export const reasons = [
   { n: "01", title: "Personalized programming", body: "Sessions are written for your level, equipment, and the week you actually have." },
-  { n: "02", title: "Real coach support", body: "Check-ins are read by the coach. Adjustments come from your progress, not a template." },
-  { n: "03", title: "Train anywhere", body: "Online coaching works in a commercial gym, a home setup, or while you travel." },
+  { n: "02", title: "Exercise videos", body: "Each package includes instructional videos for the gym you train at." },
+  { n: "03", title: "Three gyms", body: "Packages are written for Spark, Platinum, and Oxygen, with videos that match that gym." },
   { n: "04", title: "Structured progress", body: "Weeks are sequenced. You always know the session, the intent, and what comes next." },
   { n: "05", title: "Video training library", body: "Each movement has a reference for setup, tempo, and the mistakes to avoid." },
-  { n: "06", title: "Nutrition guidance", body: "Targets and meal structure that fit your life, with room to adjust." },
+  { n: "06", title: "Personal workout plan", body: "After your package is confirmed, a workout plan is assigned to your account." },
 ];
 
 export const faqs = [
   {
     q: "Who are these programs for?",
-    a: "Adults who want a clear plan and a coach who will adjust it. Beginners, returning athletes, and people already training are all in the right place if they can commit to the block.",
+    a: "Adults who want a training package, a personal workout plan, and exercise videos for Spark, Platinum, or Oxygen.",
   },
   {
     q: "Can beginners join?",
-    a: "Yes. The assessment sets the starting point. Exercises, volume, and nutrition targets are scaled to where you are, not to a competition stage.",
+    a: "Yes. The workout plan is written for your level and the gym you train at.",
   },
   {
     q: "Do I need a gym?",
-    a: "A gym helps for the strength work. If you train at home, say so in the assessment and the plan is written for the equipment you have.",
+    a: "Packages are for Spark, Platinum, and Oxygen. Choose the gym where you train.",
   },
   {
-    q: "Do programs include nutrition?",
-    a: "Nutrition Guidance, Training + Nutrition, Body Transformation, and the Progress, Transform, and Elite packages include it. Training-only options stay focused on the sessions.",
+    q: "Does this include nutrition?",
+    a: "No. Badran offers training packages, personalized workout plans, and exercise videos.",
   },
   {
     q: "How long are the programs?",
@@ -121,30 +123,30 @@ export const faqs = [
   },
   {
     q: "Can I train from home?",
-    a: "Yes, when the program is online. Tell us what you have available and the sessions will match it.",
+    a: "Packages are gym-based. Choose Spark, Platinum, or Oxygen.",
   },
   {
     q: "How do I receive my plan?",
-    a: "After payment is confirmed, your account is opened and the program appears in your dashboard: schedule, sessions, and nutrition where included.",
+    a: "After payment is confirmed, your workout plan and exercise videos appear in your member account.",
   },
   {
-    q: "How does online coaching work?",
-    a: "You train with the plan in your dashboard, watch the movement references, and check in on the agreed day. The next week is adjusted from that check-in.",
+    q: "How do the videos and plan work?",
+    a: "You follow the assigned plan and watch the exercise videos for your package.",
   },
   {
-    q: "Can I communicate directly with the coach?",
-    a: "Packages with coach support and messaging include direct messages inside your account, plus the weekly check-in.",
+    q: "How do I contact Badran?",
+    a: "Contact is through the website contact form, email, or the listed social channels. The member account is for your plan and videos.",
   },
   {
     q: "What happens after payment?",
-    a: "The order is confirmed, an account is created if you do not already have one, and the program is assigned. You sign in and start from week one.",
+    a: "The order stays pending until payment is confirmed. Then your plan and videos are assigned.",
   },
 ];
 
 export const values = [
   { title: "Precision", body: "The right dose of work. Not the most work." },
   { title: "Consistency", body: "A week you can repeat beats a week you survive once." },
-  { title: "Honesty", body: "Progress is measured. The plan changes when the data says so." },
+  { title: "Honesty", body: "Progress is measured." },
   { title: "Adaptation", body: "Travel, stress, and soreness are part of the program, not a failure of it." },
 ];
 
@@ -153,22 +155,22 @@ export const aboutHome = {
     label: "About us",
     title: "Built in the gym. Written for your week.",
     paragraphs: [
-      "VBADRAN is a personal training and online coaching practice. It started from a simple problem: people were training hard and still guessing. Sessions changed every week because nothing was written down, and the food had no relationship to the work.",
-      "The coaching is the correction. A block with a point, sessions you can open and follow, and a review that changes the next week instead of repeating the last one. Competition is part of the background. The product is a plan a client can live with on a normal week.",
+      "Badran offers training packages, personal workout plans, and instructional exercise videos.",
+      "Each member receives a plan assigned to them, with videos that match their package and gym.",
     ],
     action: "Read the story",
     principles: [
       { title: "Precision", body: "The right dose of work. Not the most work." },
       { title: "Consistency", body: "A week you can repeat beats a week you survive once." },
-      { title: "Honesty", body: "Progress is measured. The plan changes when the data says so." },
+      { title: "Honesty", body: "Progress is measured." },
     ],
   },
   ar: {
     label: "من نحن",
     title: "بُني في الصالة. كُتب لأسبوعك.",
     paragraphs: [
-      "VBADRAN ممارسة للتدريب الشخصي والتدريب عن بُعد. بدأت من مشكلة بسيطة: الناس يتدرّبون بجِدّ وما زالوا يخمّنون. الجلسات كانت تتغيّر كل أسبوع لأن شيئاً لم يُكتب، والطعام لم يكن له علاقة بالتمرين.",
-      "التدريب هو التصحيح. مرحلة لها هدف، وجلسات تفتحها وتتبعها، ومراجعة تغيّر الأسبوع التالي بدل تكرار الأسبوع السابق. المنافسة جزء من الخلفية. المنتج خطة يعيش معها العميل في أسبوع عادي.",
+      "يقدّم بدران باقات تدريب، وخطط تمارين شخصية، وفيديوهات تعليمية للتمارين.",
+      "يحصل كل مشترك على خطة مخصّصة له، مع فيديوهات تناسب باقته وصالته.",
     ],
     action: "اقرأ القصة",
     principles: [
@@ -181,11 +183,5 @@ export const aboutHome = {
 
 export const packageFeatureLabels: { key: keyof import("@/types").PackageFeatures; label: string }[] = [
   { key: "training_plan", label: "Training plan" },
-  { key: "nutrition", label: "Nutrition" },
-  { key: "weekly_checkins", label: "Weekly check-ins" },
   { key: "video_library", label: "Video library" },
-  { key: "coach_support", label: "Coach support" },
-  { key: "progress_tracking", label: "Progress tracking" },
-  { key: "program_adjustments", label: "Program adjustments" },
-  { key: "messaging", label: "Messaging" },
 ];

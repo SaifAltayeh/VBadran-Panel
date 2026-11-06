@@ -25,18 +25,11 @@ pip install -r requirements.txt
 cp .env.example .env
 createdb vbadran
 python manage.py migrate
+# Local only: ALLOW_DEMO_SEED=true and DEMO_PASSWORD in backend/.env
 python manage.py seed_demo
 python manage.py runserver
 ```
 
-Admin: http://localhost:8000/admin/
+`seed_demo` is local-only and loads demo packages, not Spark / Platinum / Oxygen. Create the real gym packages in the CMS.
 
-Seeded accounts use the password in `DEMO_PASSWORD` (default `Vbadran2026!`).
-
-- `admin@vbadran.com` — Django admin
-- `client@vbadran.com` — client dashboard
-- `coach@vbadran.com` — coach side of messages
-
-The dashboard also has a “Preview the client platform” path on the login screen when you only want to walk the interface.
-
-Checkout records a pending order. Card numbers stay in the browser. Mark an order paid in Django admin to create the account and assign the program.
+Checkout records a pending order. Online payment is not active.

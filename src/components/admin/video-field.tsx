@@ -1,7 +1,7 @@
 "use client";
 
 import { Film, Upload } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { errorMessage } from "@/lib/api";
 import { uploadAdminVideo } from "@/lib/api/admin";
@@ -17,6 +17,27 @@ function previewSrc(value: string) {
   return value;
 }
 
+function hostedEmbed(url: string) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes("youtu.be")) {
+      const id = parsed.pathname.replace("/", "");
+      return id ? `https://www.youtube.com/embed/${id}` : "";
+    }
+    if (parsed.hostname.includes("youtube.com")) {
+      const id = parsed.searchParams.get("v") || parsed.pathname.split("/embed/")[1];
+      return id ? `https://www.youtube.com/embed/${id}` : "";
+    }
+    if (parsed.hostname.includes("vimeo.com")) {
+      const match = parsed.pathname.match(/\/(\d+)/);
+      return match ? `https://player.vimeo.com/video/${match[1]}` : "";
+    }
+  } catch {
+    return "";
+  }
+  return "";
+}
+
 export function VideoField({
   name,
   label,
@@ -28,15 +49,17 @@ export function VideoField({
 }) {
   const { t, arabic } = useLang();
   const guide = mediaPresets.video;
-  const [src, setSrc] = useState(defaultValue || "");
+  const incoming = defaultValue || "";
+  const [src, setSrc] = useState(incoming);
+  const [seenDefault, setSeenDefault] = useState(incoming);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const sizeHint = arabic ? guide.sizeHintAr : guide.sizeHint;
   const cropHint = arabic ? guide.cropHintAr : guide.cropHint;
-
-  useEffect(() => {
-    setSrc(defaultValue || "");
-  }, [defaultValue]);
+  if (incoming !== seenDefault) {
+    setSeenDefault(incoming);
+    setSrc(incoming);
+  }
 
   async function onPick(file: File | null) {
     if (!file) return;
@@ -64,12 +87,22 @@ export function VideoField({
     }
   }
 
+  const embed = hostedEmbed(src);
+
   return (
     <div className="grid gap-4">
       <input type="hidden" name={name} value={src} />
       <div className="overflow-hidden rounded-[18px] border border-[#e6ecf4] bg-black">
         <div className="relative aspect-video w-full">
-          {src ? (
+          {embed ? (
+            <iframe
+              title={label}
+              src={embed}
+              className="absolute inset-0 h-full w-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : src ? (
             <video key={src.slice(0, 64)} src={previewSrc(src)} controls className="absolute inset-0 h-full w-full object-contain" />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white/50">
@@ -84,6 +117,17 @@ export function VideoField({
       </div>
       <div className="grid gap-3">
         <p className={`text-[12px] font-medium text-neutral-500 ${arabic ? "font-arabic" : ""}`}>{label}</p>
+        <input
+          type="url"
+          value={src.startsWith("data:") ? "" : src}
+          placeholder={arabic ? "أو الصق رابط يوتيوب / فيميو / MP4" : "Or paste a YouTube, Vimeo, or MP4 URL"}
+          onChange={(event) => {
+            setSrc(event.target.value.trim());
+            setError("");
+          }}
+          className="h-12 w-full rounded-[18px] border border-[#e6ecf4] px-3.5 text-[15px] outline-none"
+          dir="ltr"
+        />
         <label
           className={cn(
             "relative inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#d7e0ee] bg-[#f7f9fc] px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#eef3ff]",

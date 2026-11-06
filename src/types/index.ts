@@ -275,15 +275,19 @@ export type AdminOverview = {
 export type AdminProgram = {
   id: number;
   title: string;
+  title_ar?: string;
   slug: string;
   short_description: string;
+  short_description_ar?: string;
   description: string;
+  description_ar?: string;
   price: string;
   currency: string;
-  duration_weeks: number;
+  duration_weeks: number | null;
   difficulty: string;
   category: string;
   goal: string;
+  goal_ar?: string;
   featured_image: string;
   image_alt: string;
   is_featured: boolean;
@@ -291,25 +295,47 @@ export type AdminProgram = {
   includes_nutrition: boolean;
   includes_training: boolean;
   expected_outcome: string;
+  expected_outcome_ar?: string;
   who_for: string;
+  who_for_ar?: string;
   training_structure: string;
+  training_structure_ar?: string;
   nutrition_overview: string;
   support_overview: string;
+  support_overview_ar?: string;
+};
+
+export type AdminGym = {
+  id: number;
+  name: string;
+  name_ar: string;
+  slug: string;
+  is_active: boolean;
+  order: number;
 };
 
 export type AdminPackage = {
   id: number;
   name: string;
+  name_ar?: string;
   slug: string;
   tagline: string;
+  tagline_ar?: string;
   description: string;
-  duration_weeks: number;
+  description_ar?: string;
+  duration_weeks: number | null;
   price: string;
   currency: string;
   expected_outcome: string;
+  expected_outcome_ar?: string;
   is_highlighted: boolean;
   program: number | null;
+  gym?: number | null;
+  gym_name?: string;
+  image?: string;
+  image_alt?: string;
   support_label: string;
+  support_label_ar?: string;
   training_plan: boolean;
   nutrition: boolean;
   weekly_checkins: boolean;
@@ -325,16 +351,20 @@ export type AdminPackage = {
 export type AdminTransformation = {
   id: number;
   client_name: string;
+  client_name_ar?: string;
   slug: string;
   before_image: string;
   after_image: string;
   cover_image: string;
   image_alt: string;
-  duration_weeks: number;
+  duration_weeks: number | null;
   result_summary: string;
+  result_summary_ar?: string;
   program: number | null;
   program_name: string;
+  program_name_ar?: string;
   story: string;
+  story_ar?: string;
   is_featured: boolean;
   order: number;
 };
@@ -373,28 +403,45 @@ export type AdminClient = {
   date_joined: string;
   phone: string;
   goal: string;
+  gym?: number | null;
+  gym_name?: string;
+  package_name?: string;
+  assigned_plan?: { id: number; workout_id: number; workout_title: string; notes: string } | null;
 };
 
 export type AdminExercise = {
   id: number;
   name: string;
+  name_ar?: string;
   slug: string;
   description: string;
+  description_ar?: string;
   video_url: string;
   thumbnail: string;
   image_alt: string;
   muscle_group: string;
   difficulty: string;
   instructions: string;
+  instructions_ar?: string;
   tips: string;
+  tips_ar?: string;
+  package_ids?: number[];
+  package_names?: string[];
+  is_active?: boolean;
 };
 
 export type AdminPortalVideo = {
   id: number;
-  program: number;
+  program: number | null;
   program_title: string;
+  package_ids?: number[];
+  package_names?: string[];
+  gym?: number | null;
+  gym_name?: string;
   title: string;
+  title_ar?: string;
   description: string;
+  description_ar?: string;
   video_url: string;
   thumbnail: string;
   order: number;

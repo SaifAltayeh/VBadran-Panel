@@ -5,6 +5,7 @@ import { FormEvent, useCallback, useState } from "react";
 
 import { AdminField, AdminGroup, AdminPair, AdminSaveBar, AdminSwitch } from "@/components/admin/fields";
 import { ImageField } from "@/components/admin/image-field";
+import { VideoField } from "@/components/admin/video-field";
 import { Skeleton } from "@/components/ui/primitives";
 import { errorMessage } from "@/lib/api";
 import { getAdminSite, updateAdminSite } from "@/lib/api/admin";
@@ -13,8 +14,21 @@ import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { SiteHome } from "@/lib/site-home";
 
-const sectionIds = ["hero", "about", "programs", "process", "transformations", "testimonials", "pricing", "why", "faq", "cta", "contact", "footer"] as const;
-type SectionId = (typeof sectionIds)[number];
+type SectionId =
+  | "hero"
+  | "about"
+  | "programs"
+  | "process"
+  | "transformations"
+  | "testimonials"
+  | "pricing"
+  | "why"
+  | "faq"
+  | "cta"
+  | "contact"
+  | "footer"
+  | "brand"
+  | "legal";
 
 function Panel({
   id,
@@ -40,6 +54,111 @@ function Panel({
       </div>
       <div className="space-y-5 px-5 py-5 md:px-6">{children}</div>
     </section>
+  );
+}
+
+function RemoveLink({ onClick }: { onClick: () => void }) {
+  const { t, arabic } = useLang();
+  return (
+    <button type="button" onClick={onClick} className={`shrink-0 pb-3 text-sm text-neutral-500 hover:text-black ${arabic ? "font-arabic" : ""}`}>
+      {t.admin.remove}
+    </button>
+  );
+}
+
+function FooterEditor({ site }: { site: SiteHome["site"] }) {
+  const { t, arabic } = useLang();
+  const [email, setEmail] = useState(site.email || "");
+  const [phone, setPhone] = useState(site.phoneDisplay || "");
+  const [phoneHref, setPhoneHref] = useState(site.phoneHref || "");
+  const [blurbKey, setBlurbKey] = useState(0);
+  const [tagKey, setTagKey] = useState(0);
+  const [socials, setSocials] = useState(() => {
+    const items = (site.socials || []).filter((item) => item.label || item.href);
+    return items.length ? items.map((item, index) => ({ id: `s${index}`, ...item })) : [{ id: "s0", label: "", href: "" }];
+  });
+
+  return (
+    <>
+      <p className={`text-sm text-neutral-500 ${arabic ? "font-arabic" : ""}`}>
+        {arabic
+          ? "احذف بريداً أو رقماً أو رابطاً ثم احفظ. العنصر المحذوف يختفي من تذييل الموقع."
+          : "Remove an email, number, or social link, then save. Removed items leave the website footer."}
+      </p>
+      <div className="flex items-end gap-3">
+        <div className="min-w-0 flex-1">
+          <AdminField name="site_email" label={t.admin.emailField} value={email} onChange={(event) => setEmail(event.target.value)} dir="ltr" />
+        </div>
+        {email ? <RemoveLink onClick={() => setEmail("")} /> : null}
+      </div>
+      <div className="flex items-end gap-3">
+        <div className="min-w-0 flex-1">
+          <AdminField name="site_phone" label={t.admin.phoneField} value={phone} onChange={(event) => setPhone(event.target.value)} dir="ltr" />
+        </div>
+        {phone ? <RemoveLink onClick={() => setPhone("")} /> : null}
+      </div>
+      <div className="flex items-end gap-3">
+        <div className="min-w-0 flex-1">
+          <AdminField name="site_phone_href" label={t.admin.phoneLink} value={phoneHref} onChange={(event) => setPhoneHref(event.target.value)} dir="ltr" />
+        </div>
+        {phoneHref ? <RemoveLink onClick={() => setPhoneHref("")} /> : null}
+      </div>
+      <div>
+        <div className="mb-2 flex justify-end">
+          <RemoveLink onClick={() => setBlurbKey((current) => current + 1)} />
+        </div>
+        <AdminPair
+          key={`blurb-${blurbKey}`}
+          nameEn="site_blurb_en"
+          nameAr="site_blurb_ar"
+          label={t.admin.footerBlurb}
+          defaultEn={blurbKey ? "" : site.footerBlurb.en}
+          defaultAr={blurbKey ? "" : site.footerBlurb.ar}
+          area
+        />
+      </div>
+      <div>
+        <div className="mb-2 flex justify-end">
+          <RemoveLink onClick={() => setTagKey((current) => current + 1)} />
+        </div>
+        <AdminPair
+          key={`tag-${tagKey}`}
+          nameEn="site_tag_en"
+          nameAr="site_tag_ar"
+          label={t.admin.footerTag}
+          defaultEn={tagKey ? "" : site.footerTag.en}
+          defaultAr={tagKey ? "" : site.footerTag.ar}
+        />
+      </div>
+      {socials.map((item, index) => (
+        <AdminGroup
+          key={item.id}
+          title={`${t.admin.socialLink} ${index + 1}`}
+          action={
+            <RemoveLink
+              onClick={() =>
+                setSocials((current) => {
+                  const next = current.filter((entry) => entry.id !== item.id);
+                  return next.length ? next : [{ id: "s0", label: "", href: "" }];
+                })
+              }
+            />
+          }
+        >
+          <AdminField name={`site_soc${index + 1}_label`} label={t.admin.labelField} defaultValue={item.label} />
+          <AdminField name={`site_soc${index + 1}_href`} label={t.admin.linkField} defaultValue={item.href} dir="ltr" />
+        </AdminGroup>
+      ))}
+      {socials.length < 12 ? (
+        <button
+          type="button"
+          onClick={() => setSocials((current) => [...current, { id: `s${Date.now()}`, label: "", href: "" }])}
+          className={`text-sm text-primary ${arabic ? "font-arabic" : ""}`}
+        >
+          {arabic ? "إضافة رابط اجتماعي" : "Add social link"}
+        </button>
+      ) : null}
+    </>
   );
 }
 
@@ -69,6 +188,9 @@ export function AdminWebsiteView() {
       hero: {
         visible: form.get("hero_visible") === "on",
         image: String(form.get("hero_image") || ""),
+        video: String(form.get("hero_video") || ""),
+        videoUrl: String(form.get("hero_video_url") || ""),
+        poster: String(form.get("hero_poster") || ""),
         alt: { en: String(form.get("hero_alt_en") || ""), ar: String(form.get("hero_alt_ar") || "") },
         kicker: { en: String(form.get("hero_kicker_en") || ""), ar: String(form.get("hero_kicker_ar") || "") },
         title: {
@@ -131,8 +253,8 @@ export function AdminWebsiteView() {
         },
         testimonials: { visible: form.get("sec_testimonials") === "on" },
         pricing: {
-          visible: form.get("sec_pricing") === "on",
-          heading: { en: String(form.get("pricing_h_en") || ""), ar: String(form.get("pricing_h_ar") || "") },
+          visible: false,
+          heading: s.pricing.heading,
         },
         why: {
           visible: form.get("sec_why") === "on",
@@ -199,18 +321,7 @@ export function AdminWebsiteView() {
           close: { en: String(form.get("page_work_c_en") || ""), ar: String(form.get("page_work_c_ar") || "") },
           action: { en: String(form.get("page_work_a_en") || ""), ar: String(form.get("page_work_a_ar") || "") },
         },
-        pricing: {
-          kicker: { en: String(form.get("page_price_k_en") || ""), ar: String(form.get("page_price_k_ar") || "") },
-          title: { en: String(form.get("page_price_t_en") || ""), ar: String(form.get("page_price_t_ar") || "") },
-          lead: { en: String(form.get("page_price_l_en") || ""), ar: String(form.get("page_price_l_ar") || "") },
-          compare: { en: String(form.get("page_price_cmp_en") || ""), ar: String(form.get("page_price_cmp_ar") || "") },
-          included: { en: String(form.get("page_price_inc_en") || ""), ar: String(form.get("page_price_inc_ar") || "") },
-          close: { en: String(form.get("page_price_c_en") || ""), ar: String(form.get("page_price_c_ar") || "") },
-          start: { en: String(form.get("page_price_st_en") || ""), ar: String(form.get("page_price_st_ar") || "") },
-          chosen: { en: String(form.get("page_price_ch_en") || ""), ar: String(form.get("page_price_ch_ar") || "") },
-          duration: { en: String(form.get("page_price_d_en") || ""), ar: String(form.get("page_price_d_ar") || "") },
-          yes: { en: String(form.get("page_price_y_en") || ""), ar: String(form.get("page_price_y_ar") || "") },
-        },
+        pricing: pages.pricing,
         faq: {
           kicker: { en: String(form.get("page_faq_k_en") || ""), ar: String(form.get("page_faq_k_ar") || "") },
           still: { en: String(form.get("page_faq_s_en") || ""), ar: String(form.get("page_faq_s_ar") || "") },
@@ -227,16 +338,29 @@ export function AdminWebsiteView() {
           receivedBody: { en: String(form.get("page_con_rb_en") || ""), ar: String(form.get("page_con_rb_ar") || "") },
           send: { en: String(form.get("page_con_s_en") || ""), ar: String(form.get("page_con_s_ar") || "") },
         },
+        terms: {
+          title: { en: String(form.get("legal_terms_t_en") || ""), ar: String(form.get("legal_terms_t_ar") || "") },
+          body: { en: String(form.get("legal_terms_b_en") || ""), ar: String(form.get("legal_terms_b_ar") || "") },
+        },
+        privacy: {
+          title: { en: String(form.get("legal_privacy_t_en") || ""), ar: String(form.get("legal_privacy_t_ar") || "") },
+          body: { en: String(form.get("legal_privacy_b_en") || ""), ar: String(form.get("legal_privacy_b_ar") || "") },
+        },
       },
       site: {
         email: String(form.get("site_email") || ""),
         phoneDisplay: String(form.get("site_phone") || ""),
         phoneHref: String(form.get("site_phone_href") || ""),
+        brandName: { en: String(form.get("site_brand_en") || ""), ar: String(form.get("site_brand_ar") || "") },
+        logo: String(form.get("site_logo") || ""),
+        favicon: String(form.get("site_favicon") || ""),
+        ogImage: String(form.get("site_og") || ""),
+        arabicOnly: form.get("site_arabic_only") === "on",
         footerBlurb: { en: String(form.get("site_blurb_en") || ""), ar: String(form.get("site_blurb_ar") || "") },
         footerTag: { en: String(form.get("site_tag_en") || ""), ar: String(form.get("site_tag_ar") || "") },
-        socials: [1, 2, 3, 4].map((index) => ({
-          label: String(form.get(`site_soc${index}_label`) || ""),
-          href: String(form.get(`site_soc${index}_href`) || ""),
+        socials: Array.from({ length: 12 }, (_, index) => ({
+          label: String(form.get(`site_soc${index + 1}_label`) || ""),
+          href: String(form.get(`site_soc${index + 1}_href`) || ""),
         })).filter((item) => item.label || item.href),
       },
     };
@@ -262,12 +386,13 @@ export function AdminWebsiteView() {
     { id: "process", label: t.admin.process },
     { id: "transformations", label: t.admin.transformations },
     { id: "testimonials", label: t.admin.testimonials },
-    { id: "pricing", label: t.admin.pricing },
     { id: "why", label: t.admin.why },
     { id: "faq", label: t.admin.faq },
     { id: "cta", label: t.admin.cta },
     { id: "contact", label: t.admin.contactPage },
     { id: "footer", label: t.admin.footer },
+    { id: "brand", label: arabic ? "الهوية" : "Brand" },
+    { id: "legal", label: arabic ? "قانوني" : "Legal" },
   ];
 
   return (
@@ -304,6 +429,9 @@ export function AdminWebsiteView() {
       <Panel id="hero" active={active} title={t.admin.heroBanner} switchName="hero_visible" visible={hero.visible}>
         <AdminGroup title={t.admin.media}>
           <ImageField name="hero_image" label={t.admin.imagePath} defaultValue={hero.image} preset="hero" />
+          <ImageField name="hero_poster" label={arabic ? "صورة الغلاف" : "Video poster"} defaultValue={hero.poster} preset="hero" />
+          <VideoField name="hero_video" label={arabic ? "فيديو المقدمة" : "Intro video file"} defaultValue={hero.video} />
+          <AdminField name="hero_video_url" label={arabic ? "رابط فيديو خارجي" : "External video URL"} defaultValue={hero.videoUrl} dir="ltr" placeholder="https://youtube.com/..." />
           <AdminPair nameEn="hero_alt_en" nameAr="hero_alt_ar" label={t.admin.imageAlt} defaultEn={hero.alt.en} defaultAr={hero.alt.ar} />
         </AdminGroup>
         <AdminGroup title={t.admin.copyGroup}>
@@ -440,24 +568,6 @@ export function AdminWebsiteView() {
         </p>
       </Panel>
 
-      <Panel id="pricing" active={active} title={t.admin.pricing} switchName="sec_pricing" visible={s.pricing.visible}>
-        <AdminGroup title={t.admin.homeSections}>
-          <AdminPair nameEn="pricing_h_en" nameAr="pricing_h_ar" label={t.admin.headingField} defaultEn={s.pricing.heading.en} defaultAr={s.pricing.heading.ar} />
-        </AdminGroup>
-        <AdminGroup title={t.admin.pricingPage}>
-          <AdminPair nameEn="page_price_k_en" nameAr="page_price_k_ar" label={t.admin.kickerField} defaultEn={pages.pricing.kicker.en} defaultAr={pages.pricing.kicker.ar} />
-          <AdminPair nameEn="page_price_t_en" nameAr="page_price_t_ar" label={t.admin.titleField} defaultEn={pages.pricing.title.en} defaultAr={pages.pricing.title.ar} />
-          <AdminPair nameEn="page_price_l_en" nameAr="page_price_l_ar" label={t.admin.lead} defaultEn={pages.pricing.lead.en} defaultAr={pages.pricing.lead.ar} area />
-          <AdminPair nameEn="page_price_cmp_en" nameAr="page_price_cmp_ar" label={t.admin.compare} defaultEn={pages.pricing.compare.en} defaultAr={pages.pricing.compare.ar} />
-          <AdminPair nameEn="page_price_inc_en" nameAr="page_price_inc_ar" label={t.admin.included} defaultEn={pages.pricing.included.en} defaultAr={pages.pricing.included.ar} />
-          <AdminPair nameEn="page_price_ch_en" nameAr="page_price_ch_ar" label={t.admin.chosen} defaultEn={pages.pricing.chosen.en} defaultAr={pages.pricing.chosen.ar} />
-          <AdminPair nameEn="page_price_d_en" nameAr="page_price_d_ar" label={t.admin.duration} defaultEn={pages.pricing.duration.en} defaultAr={pages.pricing.duration.ar} />
-          <AdminPair nameEn="page_price_st_en" nameAr="page_price_st_ar" label={t.admin.buttonField} defaultEn={pages.pricing.start.en} defaultAr={pages.pricing.start.ar} />
-          <AdminPair nameEn="page_price_y_en" nameAr="page_price_y_ar" label={t.admin.yesLabel} defaultEn={pages.pricing.yes.en} defaultAr={pages.pricing.yes.ar} />
-          <AdminPair nameEn="page_price_c_en" nameAr="page_price_c_ar" label={t.admin.closeText} defaultEn={pages.pricing.close.en} defaultAr={pages.pricing.close.ar} area />
-        </AdminGroup>
-      </Panel>
-
       <Panel id="why" active={active} title={t.admin.why} switchName="sec_why" visible={s.why.visible}>
         <AdminPair nameEn="why_h_en" nameAr="why_h_ar" label={t.admin.headingField} defaultEn={s.why.heading.en} defaultAr={s.why.heading.ar} />
         {(s.why.items ?? []).map((item, index) => (
@@ -500,18 +610,28 @@ export function AdminWebsiteView() {
         <AdminPair nameEn="page_con_s_en" nameAr="page_con_s_ar" label={t.admin.buttonField} defaultEn={pages.contact.send.en} defaultAr={pages.contact.send.ar} />
       </Panel>
 
+      <Panel id="brand" active={active} title={arabic ? "الهوية" : "Brand"}>
+        <AdminPair nameEn="site_brand_en" nameAr="site_brand_ar" label={arabic ? "اسم العلامة" : "Brand name"} defaultEn={siteInfo.brandName?.en} defaultAr={siteInfo.brandName?.ar} />
+        <ImageField name="site_logo" label={arabic ? "شعار الرأس" : "Header logo"} defaultValue={siteInfo.logo} />
+        <ImageField name="site_favicon" label="Favicon" defaultValue={siteInfo.favicon} />
+        <ImageField name="site_og" label={arabic ? "صورة المشاركة" : "Social preview image"} defaultValue={siteInfo.ogImage} />
+        <AdminSwitch name="site_arabic_only" label={arabic ? "وضع العربية فقط" : "Arabic only mode"} defaultChecked={siteInfo.arabicOnly} />
+      </Panel>
+
+      <Panel id="legal" active={active} title={arabic ? "قانوني" : "Legal"}>
+        <p className="text-sm text-neutral-500">
+          {arabic
+            ? "اترك النص فارغاً حتى يعتمد العميل الصياغة القانونية. لا تُعرض سياسات وهمية."
+            : "Leave the body empty until the client approves legal copy. Do not publish placeholder policies."}
+        </p>
+        <AdminPair nameEn="legal_terms_t_en" nameAr="legal_terms_t_ar" label={arabic ? "عنوان الشروط" : "Terms title"} defaultEn={pages.terms?.title.en} defaultAr={pages.terms?.title.ar} />
+        <AdminPair nameEn="legal_terms_b_en" nameAr="legal_terms_b_ar" label={arabic ? "نص الشروط" : "Terms body"} defaultEn={pages.terms?.body.en} defaultAr={pages.terms?.body.ar} area />
+        <AdminPair nameEn="legal_privacy_t_en" nameAr="legal_privacy_t_ar" label={arabic ? "عنوان الخصوصية" : "Privacy title"} defaultEn={pages.privacy?.title.en} defaultAr={pages.privacy?.title.ar} />
+        <AdminPair nameEn="legal_privacy_b_en" nameAr="legal_privacy_b_ar" label={arabic ? "نص الخصوصية" : "Privacy body"} defaultEn={pages.privacy?.body.en} defaultAr={pages.privacy?.body.ar} area />
+      </Panel>
+
       <Panel id="footer" active={active} title={t.admin.footer}>
-        <AdminField name="site_email" label={t.admin.emailField} defaultValue={siteInfo.email} dir="ltr" />
-        <AdminField name="site_phone" label={t.admin.phoneField} defaultValue={siteInfo.phoneDisplay} dir="ltr" />
-        <AdminField name="site_phone_href" label={t.admin.phoneLink} defaultValue={siteInfo.phoneHref} dir="ltr" />
-        <AdminPair nameEn="site_blurb_en" nameAr="site_blurb_ar" label={t.admin.footerBlurb} defaultEn={siteInfo.footerBlurb.en} defaultAr={siteInfo.footerBlurb.ar} area />
-        <AdminPair nameEn="site_tag_en" nameAr="site_tag_ar" label={t.admin.footerTag} defaultEn={siteInfo.footerTag.en} defaultAr={siteInfo.footerTag.ar} />
-        {siteInfo.socials.map((item, index) => (
-          <AdminGroup key={index} title={`${t.admin.socialLink} ${index + 1}`}>
-            <AdminField name={`site_soc${index + 1}_label`} label={t.admin.labelField} defaultValue={item.label} />
-            <AdminField name={`site_soc${index + 1}_href`} label={t.admin.linkField} defaultValue={item.href} dir="ltr" />
-          </AdminGroup>
-        ))}
+        <FooterEditor site={siteInfo} />
       </Panel>
 
       <AdminSaveBar pending={pending} error={error} notice={notice} saveLabel={t.admin.saveChanges} savingLabel={t.admin.saving} />

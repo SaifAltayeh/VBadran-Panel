@@ -1,5 +1,5 @@
-import { AdminProgramForm } from "@/components/admin/views";
+import { AdminPackageForm } from "@/components/admin/views";
 
 export default function Page() {
-  return <AdminProgramForm />;
+  return <AdminPackageForm />;
 }

@@ -1,5 +1,5 @@
-import { AdminPackageList } from "@/components/admin/views";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <AdminPackageList />;
+  redirect("/admin/programs");
 }

@@ -1,5 +1,5 @@
-import { AdminPortalVideoList } from "@/components/admin/member-portal";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <AdminPortalVideoList />;
+  redirect("/admin/member-portal/exercises");
 }

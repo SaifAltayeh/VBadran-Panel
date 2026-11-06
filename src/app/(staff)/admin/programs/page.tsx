@@ -1,5 +1,5 @@
-import { AdminProgramList } from "@/components/admin/views";
+import { AdminPackageList } from "@/components/admin/views";
 
 export default function Page() {
-  return <AdminProgramList />;
+  return <AdminPackageList />;
 }

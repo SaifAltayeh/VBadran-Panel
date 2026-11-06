@@ -1,5 +1,5 @@
-import { AdminNutritionForm } from "@/components/admin/member-portal";
+import { notFound } from "next/navigation";
 
 export default function Page() {
-  return <AdminNutritionForm />;
+  notFound();
 }

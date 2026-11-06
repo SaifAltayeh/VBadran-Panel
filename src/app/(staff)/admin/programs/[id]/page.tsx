@@ -1,6 +1,6 @@
-import { AdminProgramForm } from "@/components/admin/views";
+import { AdminPackageForm } from "@/components/admin/views";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return <AdminProgramForm id={Number(id)} />;
+  return <AdminPackageForm id={Number(id)} />;
 }

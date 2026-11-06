@@ -1,6 +1,5 @@
-import { AdminPortalVideoForm } from "@/components/admin/member-portal";
+import { redirect } from "next/navigation";
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <AdminPortalVideoForm id={Number(id)} />;
+export default function Page() {
+  redirect("/admin/member-portal/exercises");
 }

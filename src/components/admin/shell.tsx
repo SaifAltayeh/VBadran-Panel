@@ -5,7 +5,6 @@ import {
   LogOut,
   Mail,
   MessagesSquare,
-  Package,
   PanelsTopLeft,
   Search,
   StretchHorizontal,
@@ -15,7 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 import { LanguageToggle, useLang } from "@/lib/i18n";
 import { clearSession } from "@/lib/api";
@@ -26,7 +25,6 @@ const hrefs = [
   { href: "/admin", key: "overview", icon: LayoutDashboard },
   { href: "/admin/website", key: "website", icon: PanelsTopLeft },
   { href: "/admin/programs", key: "programs", icon: StretchHorizontal },
-  { href: "/admin/packages", key: "packages", icon: Package },
   { href: "/admin/member-portal", key: "memberPortal", icon: TabletSmartphone },
   { href: "/admin/transformations", key: "transformations", icon: Users },
   { href: "/admin/testimonials", key: "testimonials", icon: MessagesSquare },
@@ -43,17 +41,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const { t, arabic } = useLang();
   const pathname = usePathname();
   const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const staff = useSyncExternalStore(
+    () => () => undefined,
+    isStaffSession,
+    () => false,
+  );
   const links = hrefs.map((item) => ({ ...item, label: t.admin[item.key] }));
   const current = links.find((item) => active(pathname, item.href)) ?? links[0];
 
   useEffect(() => {
-    if (!isStaffSession()) {
-      router.replace("/login");
-      return;
-    }
-    setReady(true);
-  }, [router]);
+    if (!staff) router.replace("/login");
+  }, [staff, router]);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -75,14 +73,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     router.push("/login");
   }
 
-  if (!ready) return null;
+  if (!staff) return null;
 
   return (
     <div data-admin dir={arabic ? "rtl" : "ltr"} className="fixed inset-0 z-20 flex overflow-hidden bg-[#0b1220] font-sans tracking-normal [word-spacing:0.05em]">
       <aside className="hidden h-full w-[248px] shrink-0 flex-col overflow-hidden bg-[#0b1220] px-5 py-6 text-white lg:flex">
           <div className="shrink-0">
             <Link href="/admin" className="px-2 font-display text-[22px] font-bold tracking-tight">
-              VBADRAN
+              Badran
             </Link>
             <p className="mt-1 px-2 text-[11px] text-white/40">{t.admin.kicker}</p>
             <p className={`mt-8 px-2 text-[10px] uppercase tracking-[0.18em] text-white/35 ${arabic ? "font-arabic tracking-normal" : ""}`}>
@@ -132,7 +130,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[#e8edf5] bg-white px-5 py-4 lg:px-8">
             <div className="min-w-0">
               <Link href="/admin" className="font-display text-lg font-bold tracking-tight lg:hidden">
-                VBADRAN
+                Badran
               </Link>
               <h1 className={`truncate text-lg font-semibold text-neutral-950 lg:hidden ${arabic ? "font-arabic" : "font-display tracking-tight"}`}>
                 {current.label}

@@ -1,6 +1,5 @@
-import { AdminNutritionForm } from "@/components/admin/member-portal";
+import { notFound } from "next/navigation";
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <AdminNutritionForm id={Number(id)} />;
+export default function Page() {
+  notFound();
 }

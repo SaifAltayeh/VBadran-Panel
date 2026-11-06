@@ -1,7 +1,7 @@
 "use client";
 
 import { ImageIcon, Upload } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { errorMessage } from "@/lib/api";
 import { uploadAdminImage } from "@/lib/api/admin";
@@ -171,17 +171,19 @@ export function ImageField({
 }) {
   const { t, arabic } = useLang();
   const guide = mediaPresets[preset] || mediaPresets.program;
-  const [src, setSrc] = useState(defaultValue || "");
+  const incoming = defaultValue || "";
+  const [src, setSrc] = useState(incoming);
+  const [seenDefault, setSeenDefault] = useState(incoming);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [cropSource, setCropSource] = useState<string | null>(null);
   const sizeHint = arabic ? guide.sizeHintAr : guide.sizeHint;
   const cropHint = arabic ? guide.cropHintAr : guide.cropHint;
   const previewStyle = useMemo(() => ({ aspectRatio: `${guide.aspect}` }), [guide.aspect]);
-
-  useEffect(() => {
-    setSrc(defaultValue || "");
-  }, [defaultValue]);
+  if (incoming !== seenDefault) {
+    setSeenDefault(incoming);
+    setSrc(incoming);
+  }
 
   async function uploadCropped(blob: Blob) {
     setPending(true);

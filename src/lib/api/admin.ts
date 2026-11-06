@@ -1,6 +1,7 @@
 import type {
   AdminClient,
   AdminExercise,
+  AdminGym,
   AdminInquiry,
   AdminNutritionPlan,
   AdminOverview,
@@ -99,6 +100,11 @@ export const updateAdminInquiry = (id: number, payload: Partial<AdminInquiry>) =
   apiFetch<AdminInquiry>(`/admin/inquiries/${id}/`, { method: "PATCH", body: JSON.stringify(payload) });
 
 export const getAdminClients = () => apiFetch<AdminClient[]>("/admin/clients/");
+export const getAdminClient = (id: number) => apiFetch<AdminClient>(`/admin/clients/${id}/`);
+export const updateAdminClient = (id: number, payload: Partial<AdminClient> & { assigned_workout?: number | null; plan_notes?: string }) =>
+  apiFetch<AdminClient>(`/admin/clients/${id}/`, { method: "PATCH", body: JSON.stringify(payload), ...writeTimeout });
+
+export const getAdminGyms = () => apiFetch<AdminGym[]>("/admin/gyms/");
 
 export const getAdminExercises = () => apiFetch<AdminExercise[]>("/admin/exercises/");
 export const getAdminExercise = (id: number) => apiFetch<AdminExercise>(`/admin/exercises/${id}/`);

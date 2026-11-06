@@ -5,15 +5,13 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useMemo, useState } from "react";
 import {
   CalendarDays,
-  Clapperboard,
   Dumbbell,
   Library,
-  Salad,
   ShieldCheck,
 } from "lucide-react";
 
 import { BackLink } from "@/components/admin/back-link";
-import { AdminArea, AdminField, AdminSwitch } from "@/components/admin/fields";
+import { AdminArea, AdminField, AdminPair, AdminSwitch } from "@/components/admin/fields";
 import { ImageField } from "@/components/admin/image-field";
 import { VideoField } from "@/components/admin/video-field";
 import { DashTitle } from "@/components/dashboard/ui";
@@ -21,22 +19,20 @@ import { Button, Skeleton } from "@/components/ui/primitives";
 import { errorMessage } from "@/lib/api";
 import {
   createAdminExercise,
-  createAdminNutritionPlan,
   createAdminPortalVideo,
   createAdminSchedule,
   createAdminSubscription,
   createAdminWorkout,
   deleteAdminExercise,
-  deleteAdminNutritionPlan,
   deleteAdminPortalVideo,
   deleteAdminSchedule,
   deleteAdminSubscription,
   deleteAdminWorkout,
   getAdminClients,
+  getAdminGyms,
+  getAdminPackages,
   getAdminExercise,
   getAdminExercises,
-  getAdminNutritionPlan,
-  getAdminNutritionPlans,
   getAdminPortalVideo,
   getAdminPortalVideos,
   getAdminPrograms,
@@ -47,7 +43,6 @@ import {
   getAdminWorkout,
   getAdminWorkouts,
   updateAdminExercise,
-  updateAdminNutritionPlan,
   updateAdminPortalVideo,
   updateAdminSchedule,
   updateAdminSubscription,
@@ -81,6 +76,34 @@ function useFormState() {
 
 function FormGrid({ children }: { children: React.ReactNode }) {
   return <div className="mt-6 grid gap-4 md:grid-cols-2">{children}</div>;
+}
+
+function PackageProgramPicker({
+  packages,
+  selected,
+}: {
+  packages: { id: number; name: string; name_ar?: string; is_active?: boolean }[];
+  selected?: number[];
+}) {
+  const { arabic } = useLang();
+  const chosen = selected || [];
+  const items = packages.filter((item) => item.is_active !== false || chosen.includes(item.id));
+  return (
+    <div className="mt-4">
+      <p className="mb-1 text-[12px] font-medium text-neutral-500">{arabic ? "البرنامج" : "Program"}</p>
+      <p className="mb-3 text-sm text-neutral-400">
+        {arabic ? "حدد إن كان هذا لسبارك أو بلاتينوم أو أوكسجين. يمكن اختيار أكثر من برنامج." : "Mark this for Spark, Platinum, or Oxygen. You can choose more than one."}
+      </p>
+      <div className="grid gap-2 sm:grid-cols-3">
+        {items.map((item) => (
+          <label key={item.id} className="flex items-center gap-2 rounded-[16px] border border-[#e6ecf4] px-3 py-3 text-sm">
+            <input type="checkbox" name="package_ids" value={item.id} defaultChecked={chosen.includes(item.id)} />
+            {arabic ? item.name_ar || item.name : item.name}
+          </label>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function ListHeader({ title, href, create }: { title: string; href: string; create: string }) {
@@ -118,26 +141,43 @@ function FormShell({
 }: {
   title: string;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  onDelete?: () => void;
+  onDelete?: () => void | Promise<void>;
   pending: boolean;
   error: string;
   notice: string;
   children: React.ReactNode;
 }) {
   const { t, arabic } = useLang();
+  const [deleteError, setDeleteError] = useState("");
+  const [deleting, setDeleting] = useState(false);
   return (
     <form onSubmit={onSubmit} className="rounded-[24px] bg-white p-5 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.28)] md:p-8">
       <DashTitle arabic={arabic}>{title}</DashTitle>
       {children}
-      {error ? <p className="mt-4 text-sm text-primary">{error}</p> : null}
+      {error || deleteError ? <p className="mt-4 text-sm text-primary">{error || deleteError}</p> : null}
       {notice ? <p className="mt-4 text-sm text-neutral-500">{notice}</p> : null}
       <div className="mt-6 flex flex-wrap gap-3">
-        <Button type="submit" disabled={pending} arrow={false}>
+        <Button type="submit" disabled={pending || deleting} arrow={false}>
           {pending ? t.admin.saving : t.admin.save}
         </Button>
         {onDelete ? (
-          <button type="button" onClick={onDelete} className="rounded-full px-5 text-sm text-neutral-500 hover:text-black">
-            {t.admin.remove}
+          <button
+            type="button"
+            disabled={pending || deleting}
+            onClick={async () => {
+              if (!window.confirm(arabic ? "حذف هذا العنصر؟" : "Delete this item?")) return;
+              setDeleteError("");
+              setDeleting(true);
+              try {
+                await onDelete();
+              } catch (err) {
+                setDeleteError(errorMessage(err));
+                setDeleting(false);
+              }
+            }}
+            className="rounded-full px-5 text-sm text-neutral-500 hover:text-black disabled:opacity-50"
+          >
+            {deleting ? (arabic ? "جاري الحذف..." : "Deleting...") : t.admin.remove}
           </button>
         ) : null}
       </div>
@@ -146,12 +186,6 @@ function FormShell({
 }
 
 const sections = [
-  {
-    href: "/admin/member-portal/videos",
-    key: "portalVideos",
-    body: "portalVideosBody",
-    icon: Clapperboard,
-  },
   {
     href: "/admin/member-portal/exercises",
     key: "portalExercises",
@@ -169,12 +203,6 @@ const sections = [
     key: "portalSchedules",
     body: "portalSchedulesBody",
     icon: CalendarDays,
-  },
-  {
-    href: "/admin/member-portal/nutrition",
-    key: "portalNutrition",
-    body: "portalNutritionBody",
-    icon: Salad,
   },
   {
     href: "/admin/member-portal/access",
@@ -234,7 +262,9 @@ export function AdminPortalVideoList() {
           >
             <div>
               <p className={`font-semibold ${arabic ? "font-arabic" : ""}`}>{item.title}</p>
-              <p className="mt-1 text-sm text-neutral-400">{item.program_title}</p>
+              <p className="mt-1 text-sm text-neutral-400">
+                {(item.package_names || []).join(" · ") || item.program_title || (arabic ? "بدون برنامج" : "No program")}
+              </p>
             </div>
             <StatusPill on={item.is_active} onLabel={t.admin.active} offLabel={t.admin.hidden} />
           </Link>
@@ -247,11 +277,12 @@ export function AdminPortalVideoList() {
 export function AdminPortalVideoForm({ id }: { id?: number }) {
   const { t, arabic } = useLang();
   const router = useRouter();
-  const programs = useResource(useCallback(() => getAdminPrograms(), []));
+  const packages = useResource(useCallback(() => getAdminPackages(), []));
+  const gyms = useResource(useCallback(() => getAdminGyms(), []));
   const loader = useCallback(() => (id ? getAdminPortalVideo(id) : Promise.resolve(null)), [id]);
   const { status, data } = useResource(loader);
   const form = useFormState();
-  if ((id && status === "loading" && !data) || programs.status === "loading") {
+  if ((id && status === "loading" && !data) || packages.status === "loading") {
     return <Skeleton className="h-48 w-full rounded-[24px]" />;
   }
 
@@ -261,15 +292,19 @@ export function AdminPortalVideoForm({ id }: { id?: number }) {
     const title = String(raw.get("title") || "").trim();
     const video_url = String(raw.get("video_url") || "").trim();
     if (!title || !video_url) {
-      form.setError(arabic ? "العنوان والفيديو مطلوبان." : "Title and video upload are required.");
+      form.setError(arabic ? "العنوان والفيديو مطلوبان." : "Title and video source are required.");
       return;
     }
     const payload = {
       title,
+      title_ar: String(raw.get("title_ar") || ""),
       description: String(raw.get("description") || ""),
+      description_ar: String(raw.get("description_ar") || ""),
       video_url,
       thumbnail: String(raw.get("thumbnail") || ""),
-      program: Number(raw.get("program")),
+      program: null,
+      gym: raw.get("gym") ? Number(raw.get("gym")) : null,
+      package_ids: raw.getAll("package_ids").map((value) => Number(value)).filter(Boolean),
       order: Number(raw.get("order") || 0),
       is_active: raw.get("is_active") === "on",
     };
@@ -304,7 +339,6 @@ export function AdminPortalVideoForm({ id }: { id?: number }) {
         onDelete={
           id
             ? async () => {
-                if (!window.confirm(t.admin.remove)) return;
                 await deleteAdminPortalVideo(id);
                 router.push("/admin/member-portal/videos");
               }
@@ -312,24 +346,21 @@ export function AdminPortalVideoForm({ id }: { id?: number }) {
         }
       >
         <FormGrid>
-          <AdminField name="title" label={t.admin.titleField} defaultValue={data?.title} required />
+          <AdminPair nameEn="title" nameAr="title_ar" label={t.admin.titleField} defaultEn={data?.title} defaultAr={data?.title_ar} />
           <label className="grid gap-1.5">
-            <span className="text-[12px] font-medium text-neutral-500">{t.admin.programs}</span>
-            <select
-              name="program"
-              defaultValue={data?.program || programs.data?.[0]?.id || ""}
-              className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
-              required
-            >
-              {(programs.data || []).map((program) => (
-                <option key={program.id} value={program.id}>
-                  {program.title}
+            <span className="text-[12px] font-medium text-neutral-500">{arabic ? "الصالة" : "Gym"}</span>
+            <select name="gym" defaultValue={data?.gym || ""} className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px]">
+              <option value="">{arabic ? "كل الصالات / مشتركة" : "All gyms / shared"}</option>
+              {(gyms.data || []).map((gym) => (
+                <option key={gym.id} value={gym.id}>
+                  {gym.name}
                 </option>
               ))}
             </select>
           </label>
           <AdminField name="order" label={t.admin.orderField} type="number" defaultValue={String(data?.order ?? 0)} />
         </FormGrid>
+        <PackageProgramPicker packages={packages.data || []} selected={data?.package_ids} />
         <div className="mt-4">
           <VideoField name="video_url" label={t.admin.videoFile} defaultValue={data?.video_url} />
         </div>
@@ -337,7 +368,7 @@ export function AdminPortalVideoForm({ id }: { id?: number }) {
           <ImageField name="thumbnail" label={t.admin.imagePath} defaultValue={data?.thumbnail} preset="videoThumb" />
         </div>
         <div className="mt-4">
-          <AdminArea name="description" label={t.admin.textField} defaultValue={data?.description} />
+          <AdminPair nameEn="description" nameAr="description_ar" label={t.admin.textField} defaultEn={data?.description} defaultAr={data?.description_ar} area />
         </div>
         <div className="mt-5">
           <AdminSwitch name="is_active" label={t.admin.active} defaultChecked={data?.is_active ?? true} />
@@ -367,7 +398,7 @@ export function AdminExerciseList() {
             <div>
               <p className={`font-semibold ${arabic ? "font-arabic" : ""}`}>{item.name}</p>
               <p className="mt-1 text-sm text-neutral-400">
-                {item.muscle_group} · {item.difficulty}
+                {(item.package_names || []).join(" · ") || item.muscle_group} · {item.difficulty}
               </p>
             </div>
             <StatusPill on={Boolean(item.video_url)} onLabel={t.admin.hasVideo} offLabel={t.admin.noVideo} />
@@ -381,10 +412,11 @@ export function AdminExerciseList() {
 export function AdminExerciseForm({ id }: { id?: number }) {
   const { t, arabic } = useLang();
   const router = useRouter();
+  const packages = useResource(useCallback(() => getAdminPackages(), []));
   const loader = useCallback(() => (id ? getAdminExercise(id) : Promise.resolve(null)), [id]);
   const { status, data } = useResource(loader);
   const form = useFormState();
-  if (id && status === "loading" && !data) return <Skeleton className="h-48 w-full rounded-[24px]" />;
+  if ((id && status === "loading" && !data) || packages.status === "loading") return <Skeleton className="h-48 w-full rounded-[24px]" />;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -396,15 +428,21 @@ export function AdminExerciseForm({ id }: { id?: number }) {
     }
     const payload = {
       name,
+      name_ar: String(raw.get("name_ar") || ""),
       slug: id ? String(raw.get("slug") || slugify(name)) : uniqueSlug(String(raw.get("slug") || ""), name),
       description: String(raw.get("description") || ""),
+      description_ar: String(raw.get("description_ar") || ""),
       video_url: String(raw.get("video_url") || ""),
       thumbnail: String(raw.get("thumbnail") || ""),
       image_alt: String(raw.get("image_alt") || ""),
       muscle_group: String(raw.get("muscle_group") || "Full body"),
       difficulty: String(raw.get("difficulty") || "intermediate"),
       instructions: String(raw.get("instructions") || ""),
+      instructions_ar: String(raw.get("instructions_ar") || ""),
       tips: String(raw.get("tips") || ""),
+      tips_ar: String(raw.get("tips_ar") || ""),
+      package_ids: raw.getAll("package_ids").map((value) => Number(value)).filter(Boolean),
+      is_active: raw.get("is_active") === "on",
     };
     form.setPending(true);
     form.setError("");
@@ -437,7 +475,6 @@ export function AdminExerciseForm({ id }: { id?: number }) {
         onDelete={
           id
             ? async () => {
-                if (!window.confirm(t.admin.remove)) return;
                 await deleteAdminExercise(id);
                 router.push("/admin/member-portal/exercises");
               }
@@ -445,12 +482,13 @@ export function AdminExerciseForm({ id }: { id?: number }) {
         }
       >
         <FormGrid>
-          <AdminField name="name" label={t.admin.nameField} defaultValue={data?.name} required />
+          <AdminPair nameEn="name" nameAr="name_ar" label={t.admin.nameField} defaultEn={data?.name} defaultAr={data?.name_ar} />
           <AdminField name="slug" label="Slug" defaultValue={data?.slug} />
           <AdminField name="muscle_group" label={t.admin.muscleGroup} defaultValue={data?.muscle_group || "Full body"} />
           <AdminField name="difficulty" label={t.admin.difficultyField} defaultValue={data?.difficulty || "intermediate"} />
           <AdminField name="image_alt" label={t.admin.imageAlt} defaultValue={data?.image_alt} />
         </FormGrid>
+        <PackageProgramPicker packages={packages.data || []} selected={data?.package_ids} />
         <div className="mt-4">
           <VideoField name="video_url" label={t.admin.videoFile} defaultValue={data?.video_url} />
         </div>
@@ -458,9 +496,10 @@ export function AdminExerciseForm({ id }: { id?: number }) {
           <ImageField name="thumbnail" label={t.admin.imagePath} defaultValue={data?.thumbnail} preset="exercise" />
         </div>
         <div className="mt-4 grid gap-4">
-          <AdminArea name="description" label={t.admin.textField} defaultValue={data?.description} />
-          <AdminArea name="instructions" label={t.admin.instructionsField} defaultValue={data?.instructions} />
-          <AdminArea name="tips" label={t.admin.tipsField} defaultValue={data?.tips} />
+          <AdminPair nameEn="description" nameAr="description_ar" label={t.admin.textField} defaultEn={data?.description} defaultAr={data?.description_ar} area />
+          <AdminPair nameEn="instructions" nameAr="instructions_ar" label={t.admin.instructionsField} defaultEn={data?.instructions} defaultAr={data?.instructions_ar} area />
+          <AdminPair nameEn="tips" nameAr="tips_ar" label={t.admin.tipsField} defaultEn={data?.tips} defaultAr={data?.tips_ar} area />
+          <AdminSwitch name="is_active" label={t.admin.active} defaultChecked={data?.is_active ?? true} />
         </div>
       </FormShell>
     </div>
@@ -584,7 +623,6 @@ export function AdminWorkoutForm({ id }: { id?: number }) {
         onDelete={
           id
             ? async () => {
-                if (!window.confirm(t.admin.remove)) return;
                 await deleteAdminWorkout(id);
                 router.push("/admin/member-portal/workouts");
               }
@@ -654,7 +692,7 @@ export function AdminScheduleList() {
 }
 
 export function AdminScheduleForm({ id }: { id?: number }) {
-  const { t, arabic } = useLang();
+  const { t } = useLang();
   const router = useRouter();
   const programs = useResource(useCallback(() => getAdminPrograms(), []));
   const workouts = useResource(useCallback(() => getAdminWorkouts(), []));
@@ -708,7 +746,6 @@ export function AdminScheduleForm({ id }: { id?: number }) {
         onDelete={
           id
             ? async () => {
-                if (!window.confirm(t.admin.remove)) return;
                 await deleteAdminSchedule(id);
                 router.push("/admin/member-portal/schedules");
               }
@@ -752,174 +789,6 @@ export function AdminScheduleForm({ id }: { id?: number }) {
         </FormGrid>
         <div className="mt-5">
           <AdminSwitch name="is_rest" label={t.admin.restDay} defaultChecked={data?.is_rest} />
-        </div>
-      </FormShell>
-    </div>
-  );
-}
-
-export function AdminNutritionList() {
-  const { t, arabic } = useLang();
-  const { status, data } = useResource(useCallback(() => getAdminNutritionPlans(), []));
-  if (status === "loading") return <Skeleton className="h-48 w-full rounded-[24px]" />;
-  if (!data) return <p>{t.admin.loadError}</p>;
-  return (
-    <div>
-      <BackLink href="/admin/member-portal" />
-      <ListHeader title={t.admin.portalNutrition} href="/admin/member-portal/nutrition/new" create={t.admin.newItem} />
-      <TableCard>
-        {data.length === 0 ? <p className="p-6 text-neutral-500">{t.admin.empty}</p> : null}
-        {data.map((item) => (
-          <Link
-            key={item.id}
-            href={`/admin/member-portal/nutrition/${item.id}`}
-            className="flex items-center justify-between gap-4 border-b border-[#eef2f8] px-5 py-4 last:border-0 hover:bg-[#f7f9fc]"
-          >
-            <div>
-              <p className={`font-semibold ${arabic ? "font-arabic" : ""}`}>{item.title}</p>
-              <p className="mt-1 text-sm text-neutral-400">{item.program_title}</p>
-            </div>
-          </Link>
-        ))}
-      </TableCard>
-    </div>
-  );
-}
-
-export function AdminNutritionForm({ id }: { id?: number }) {
-  const { t, arabic } = useLang();
-  const router = useRouter();
-  const programs = useResource(useCallback(() => getAdminPrograms(), []));
-  const loader = useCallback(() => (id ? getAdminNutritionPlan(id) : Promise.resolve(null)), [id]);
-  const { status, data } = useResource(loader);
-  const form = useFormState();
-  const defaultDays = useMemo(
-    () =>
-      (data?.days || [])
-        .map((day) => {
-          const meals = (day.meals || []).map((meal) => `${meal.name}::${meal.suggestion}`).join(" || ");
-          return `${day.name} => ${meals}`;
-        })
-        .join("\n"),
-    [data],
-  );
-  const defaultNotes = useMemo(() => (data?.notes || []).map((note) => note.body).join("\n"), [data]);
-  if ((id && status === "loading" && !data) || programs.status === "loading") {
-    return <Skeleton className="h-48 w-full rounded-[24px]" />;
-  }
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const raw = new FormData(event.currentTarget);
-    const title = String(raw.get("title") || "").trim();
-    if (!title) {
-      form.setError(arabic ? "العنوان مطلوب." : "Title is required.");
-      return;
-    }
-    const day_rows = String(raw.get("day_rows") || "")
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line, index) => {
-        const [namePart, mealsPart = ""] = line.split("=>").map((part) => part.trim());
-        const meals = mealsPart
-          .split("||")
-          .map((chunk) => chunk.trim())
-          .filter(Boolean)
-          .map((chunk, mealIndex) => {
-            const [name, suggestion = ""] = chunk.split("::").map((part) => part.trim());
-            return { name: name || `Meal ${mealIndex + 1}`, suggestion, order: mealIndex };
-          });
-        return { name: namePart || `Day ${index + 1}`, order: index, meals };
-      });
-    const note_rows = String(raw.get("note_rows") || "")
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean);
-    const payload = {
-      program: Number(raw.get("program")),
-      title,
-      overview: String(raw.get("overview") || title),
-      calories: Number(raw.get("calories") || 0) || null,
-      protein_g: Number(raw.get("protein_g") || 0) || null,
-      carbs_g: Number(raw.get("carbs_g") || 0) || null,
-      fats_g: Number(raw.get("fats_g") || 0) || null,
-      coach_notes: String(raw.get("coach_notes") || ""),
-      download_label: String(raw.get("download_label") || ""),
-      download_url: String(raw.get("download_url") || ""),
-      day_rows,
-      note_rows,
-    };
-    form.setPending(true);
-    form.setError("");
-    form.setNotice("");
-    try {
-      if (id) await updateAdminNutritionPlan(id, payload);
-      else {
-        const created = await createAdminNutritionPlan(payload);
-        form.setNotice(t.admin.saved);
-        router.replace(`/admin/member-portal/nutrition/${created.id}`);
-        return;
-      }
-      form.setNotice(t.admin.saved);
-    } catch (err) {
-      form.setError(errorMessage(err));
-    } finally {
-      form.setPending(false);
-    }
-  }
-
-  return (
-    <div>
-      <BackLink href="/admin/member-portal/nutrition" />
-      <FormShell
-        title={data?.title || t.admin.newItem}
-        onSubmit={onSubmit}
-        pending={form.pending}
-        error={form.error}
-        notice={form.notice}
-        onDelete={
-          id
-            ? async () => {
-                if (!window.confirm(t.admin.remove)) return;
-                await deleteAdminNutritionPlan(id);
-                router.push("/admin/member-portal/nutrition");
-              }
-            : undefined
-        }
-      >
-        <FormGrid>
-          <AdminField name="title" label={t.admin.titleField} defaultValue={data?.title} required />
-          <label className="grid gap-1.5">
-            <span className="text-[12px] font-medium text-neutral-500">{t.admin.programs}</span>
-            <select
-              name="program"
-              defaultValue={data?.program || programs.data?.[0]?.id || ""}
-              className="h-12 rounded-[18px] border border-[#e6ecf4] bg-white px-3.5 text-[15px] outline-none"
-              required
-            >
-              {(programs.data || []).map((program) => (
-                <option key={program.id} value={program.id}>
-                  {program.title}
-                </option>
-              ))}
-            </select>
-          </label>
-          <AdminField name="calories" label="Calories" type="number" defaultValue={String(data?.calories || "")} />
-          <AdminField name="protein_g" label="Protein g" type="number" defaultValue={String(data?.protein_g || "")} />
-          <AdminField name="carbs_g" label="Carbs g" type="number" defaultValue={String(data?.carbs_g || "")} />
-          <AdminField name="fats_g" label="Fats g" type="number" defaultValue={String(data?.fats_g || "")} />
-        </FormGrid>
-        <div className="mt-4 grid gap-4">
-          <AdminArea name="overview" label={t.admin.lead} defaultValue={data?.overview} />
-          <AdminArea name="coach_notes" label={t.admin.coachNotes} defaultValue={data?.coach_notes} />
-          <AdminArea
-            name="day_rows"
-            label={t.admin.nutritionDays}
-            defaultValue={defaultDays}
-            placeholder={"Day 1 => Breakfast::Eggs || Lunch::Chicken"}
-          />
-          <AdminArea name="note_rows" label={t.admin.nutritionNotes} defaultValue={defaultNotes} />
         </div>
       </FormShell>
     </div>
@@ -1015,7 +884,6 @@ export function AdminAccessForm({ id }: { id?: number }) {
         onDelete={
           id
             ? async () => {
-                if (!window.confirm(t.admin.remove)) return;
                 await deleteAdminSubscription(id);
                 router.push("/admin/member-portal/access");
               }

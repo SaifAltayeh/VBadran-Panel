@@ -173,11 +173,14 @@ export function AdminPair({
   );
 }
 
-export function AdminGroup({ title, children }: { title: string; children: React.ReactNode }) {
+export function AdminGroup({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   const { arabic } = useLang();
   return (
     <div className="space-y-4 rounded-[20px] bg-[#f6f8fb] p-4 md:p-5">
-      <p className={cn("text-[11px] font-semibold text-neutral-400", arabic ? "font-arabic" : "uppercase tracking-[0.14em]")}>{title}</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className={cn("text-[11px] font-semibold text-neutral-400", arabic ? "font-arabic" : "uppercase tracking-[0.14em]")}>{title}</p>
+        {action}
+      </div>
       <div className="space-y-4">{children}</div>
     </div>
   );
@@ -197,10 +200,7 @@ export function AdminSwitch({
   onChange?: (value: boolean) => void;
 }) {
   const { arabic } = useLang();
-  const [on, setOn] = useState(Boolean(checked ?? defaultChecked));
-  useEffect(() => {
-    if (checked !== undefined) setOn(checked);
-  }, [checked]);
+  const [on, setOn] = useState(Boolean(defaultChecked));
   const active = checked ?? on;
   return (
     <label className="relative inline-flex cursor-pointer items-center gap-2.5">

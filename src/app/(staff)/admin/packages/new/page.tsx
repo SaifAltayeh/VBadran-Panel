@@ -1,5 +1,5 @@
-import { AdminPackageForm } from "@/components/admin/views";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <AdminPackageForm />;
+  redirect("/admin/programs/new");
 }

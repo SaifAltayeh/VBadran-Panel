@@ -125,16 +125,3 @@ export async function apiFetch<T>(path: string, options: Options = {}): Promise<
   return (await response.json()) as T;
 }
 
-export function isPreview() {
-  return typeof window !== "undefined" && localStorage.getItem("vb_preview") === "1";
-}
-
-export async function withFallback<T>(path: string, fallback: () => T, init?: Options): Promise<T> {
-  if (typeof window !== "undefined" && isPreview()) return fallback();
-  try {
-    return await apiFetch<T>(path, init);
-  } catch (error) {
-    if (isNetworkError(error)) return fallback();
-    throw error;
-  }
-}

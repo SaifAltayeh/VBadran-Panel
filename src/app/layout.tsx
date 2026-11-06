@@ -40,17 +40,17 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "VBADRAN Admin",
-    template: "%s — VBADRAN Admin",
+    default: "Badran Admin",
+    template: "%s — Badran Admin",
   },
   description:
-    "Personal training and online coaching from VBADRAN. Programs built around your goals, schedule, and progress.",
+    "Training packages, personal workout plans, and exercise videos from Badran.",
   openGraph: {
     type: "website",
-    siteName: "VBADRAN",
-    title: "VBADRAN — Personal Training & Online Coaching",
-    description: "Training built around you. Personal coaching, online programs, and structured progress.",
-    images: [{ url: "/images/hero/coach-portrait.jpg", alt: "VBADRAN coach portrait" }],
+    siteName: "Badran",
+    title: "Badran Admin",
+    description: "Training packages, personal workout plans, and exercise videos from Badran.",
+    images: [{ url: "/images/hero/coach-portrait.jpg", alt: "Badran" }],
   },
   twitter: { card: "summary_large_image" },
 };

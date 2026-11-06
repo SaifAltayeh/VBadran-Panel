@@ -17,6 +17,15 @@ function previewSrc(value: string) {
   return value;
 }
 
+function localVideoUploadAllowed() {
+  try {
+    const host = new URL(process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001/api").hostname;
+    return host === "localhost" || host === "127.0.0.1";
+  } catch {
+    return true;
+  }
+}
+
 function hostedEmbed(url: string) {
   try {
     const parsed = new URL(url);
@@ -61,8 +70,17 @@ export function VideoField({
     setSrc(incoming);
   }
 
+  const canUploadFile = localVideoUploadAllowed();
+  const hostedHint = arabic
+    ? "رفع الملف غير متاح على موقع التجربة. الصق رابط يوتيوب أو فيميو أو MP4 في الحقل أعلاه. ملفات الـ MOV المحلية لا تُرفع إلى Vercel."
+    : "File upload is not available on the testing site. Paste a YouTube, Vimeo, or MP4 URL above. Local MOV files cannot be sent to Vercel.";
+
   async function onPick(file: File | null) {
     if (!file) return;
+    if (!canUploadFile) {
+      setError(hostedHint);
+      return;
+    }
     if (!file.type.startsWith("video/")) {
       setError(arabic ? "ارفع ملف فيديو فقط." : "Upload a video file only.");
       return;
@@ -120,7 +138,7 @@ export function VideoField({
         <input
           type="url"
           value={src.startsWith("data:") ? "" : src}
-          placeholder={arabic ? "أو الصق رابط يوتيوب / فيميو / MP4" : "Or paste a YouTube, Vimeo, or MP4 URL"}
+          placeholder={arabic ? "الصق رابط يوتيوب / فيميو / MP4" : "Paste a YouTube, Vimeo, or MP4 URL"}
           onChange={(event) => {
             setSrc(event.target.value.trim());
             setError("");
@@ -128,28 +146,32 @@ export function VideoField({
           className="h-12 w-full rounded-[18px] border border-[#e6ecf4] px-3.5 text-[15px] outline-none"
           dir="ltr"
         />
-        <label
-          className={cn(
-            "relative inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#d7e0ee] bg-[#f7f9fc] px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#eef3ff]",
-            arabic ? "font-arabic" : "font-sans tracking-normal [word-spacing:0.06em]",
-            pending ? "pointer-events-none opacity-60" : "",
-          )}
-        >
-          <Upload className="h-4 w-4" />
-          {pending ? (arabic ? "جاري الرفع..." : "Uploading...") : t.admin.uploadVideo}
-          <input
-            type="file"
-            accept="video/mp4,video/webm,video/quicktime"
-            className="absolute inset-0 cursor-pointer opacity-0"
-            disabled={pending}
-            onChange={(event) => {
-              const file = event.target.files?.[0] || null;
-              event.target.value = "";
-              void onPick(file);
-            }}
-          />
-        </label>
-        <p className={`text-xs text-neutral-500 ${arabic ? "font-arabic" : ""}`}>{sizeHint}</p>
+        {canUploadFile ? (
+          <label
+            className={cn(
+              "relative inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#d7e0ee] bg-[#f7f9fc] px-4 py-2 text-sm text-neutral-700 transition-colors hover:bg-[#eef3ff]",
+              arabic ? "font-arabic" : "font-sans tracking-normal [word-spacing:0.06em]",
+              pending ? "pointer-events-none opacity-60" : "",
+            )}
+          >
+            <Upload className="h-4 w-4" />
+            {pending ? (arabic ? "جاري الرفع..." : "Uploading...") : t.admin.uploadVideo}
+            <input
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime"
+              className="absolute inset-0 cursor-pointer opacity-0"
+              disabled={pending}
+              onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                event.target.value = "";
+                void onPick(file);
+              }}
+            />
+          </label>
+        ) : null}
+        <p className={`text-xs text-neutral-500 ${arabic ? "font-arabic" : ""}`}>
+          {canUploadFile ? sizeHint : hostedHint}
+        </p>
         <p className={`text-xs text-neutral-400 ${arabic ? "font-arabic" : ""}`}>{cropHint}</p>
         {error ? <p className={`text-sm text-primary ${arabic ? "font-arabic" : ""}`}>{error}</p> : null}
       </div>
